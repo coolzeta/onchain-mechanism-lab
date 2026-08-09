@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <rect width="1200" height="630" fill="#fffdf7"/>
+  <path d="M0 0h1200v26H0z" fill="#153d3a"/>
+  <circle cx="1048" cy="120" r="250" fill="#e0f5ed"/>
+  <circle cx="1135" cy="548" r="190" fill="#eee9ff"/>
+  <path d="M865 400 1000 164l135 236Z" fill="none" stroke="#153d3a" stroke-width="30" stroke-linecap="round" stroke-linejoin="round" opacity=".94"/>
+  <circle cx="865" cy="402" r="62" fill="#ffd66b" stroke="#153d3a" stroke-width="22"/>
+  <circle cx="1001" cy="164" r="62" fill="#9ee3ce" stroke="#153d3a" stroke-width="22"/>
+  <circle cx="1136" cy="402" r="62" fill="#bca7ff" stroke="#153d3a" stroke-width="22"/>
+  <path d="M854 511h301" stroke="#153d3a" stroke-width="32" stroke-linecap="round"/>
+  <text x="72" y="108" fill="#45625e" font-family="Arial, Helvetica, sans-serif" font-size="26" font-weight="700" letter-spacing="5">LEARN BY SEEING · TEST BY CHANGING</text>
+  <text x="72" y="236" fill="#153d3a" font-family="Arial, PingFang SC, Microsoft YaHei, sans-serif" font-size="78" font-weight="800">链上机制实验室</text>
+  <text x="72" y="314" fill="#153d3a" font-family="Arial, Helvetica, sans-serif" font-size="42" font-weight="700">Onchain Mechanism Lab</text>
+  <text x="72" y="420" fill="#405b58" font-family="Arial, PingFang SC, Microsoft YaHei, sans-serif" font-size="31">从故事进入机制，在互动实验里看见状态、资金与风险。</text>
+  <g font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="700">
+    <rect x="72" y="485" width="210" height="58" rx="29" fill="#e0f5ed"/><text x="112" y="522" fill="#153d3a">10 COURSES</text>
+    <rect x="298" y="485" width="220" height="58" rx="29" fill="#eee9ff"/><text x="338" y="522" fill="#153d3a">42 LESSONS</text>
+    <rect x="534" y="485" width="210" height="58" rx="29" fill="#fff0bd"/><text x="574" y="522" fill="#153d3a">10 LABS</text>
+  </g>
+</svg>

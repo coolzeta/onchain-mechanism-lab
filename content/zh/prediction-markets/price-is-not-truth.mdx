@@ -1,0 +1,91 @@
+import { LessonLead, Concept, Think, MechanismDetails, Checkpoint, SourceList } from "@/platform/components/LessonPrimitives"
+import { ProbabilityLab } from "@/modules/prediction-markets/components/ProbabilityLab"
+import { ComplementArbitrageLab } from "@/modules/prediction-markets/components/ComplementArbitrageLab"
+
+<LessonLead>
+一份 YES 最终兑付 100，而现在以 70 成交，所以人们常把 70 读作“市场认为事件有约 70% 概率”。这是有用的直觉，但它是一种解释，不是系统写入的真理。
+</LessonLead>
+
+## 为什么价格可以被读成隐含概率
+
+忽略手续费、资金成本和个人偏好时，如果你认为事件发生概率是 70%，那么一份 YES 的期望兑付约为 70。价格明显低于 70 时你愿意买，高于 70 时你更愿意站到 NO 一边。
+
+许多拥有不同信息的人都这样行动，订单便可能把分散判断压缩成一个价格。这是预测市场最迷人的部分：不是询问大家相信什么，而是要求每个人为判断承担后果。
+
+<Concept title="价格是带条件的信号">
+<p>更准确的说法是：“在当前规则、参与者、资金、流动性和交易成本下，最后一笔交易发生在 70。”把它解释为概率时，不能删除这些条件。</p>
+</Concept>
+
+## 同一个 0.70 可以来自完全不同的市场
+
+<ProbabilityLab />
+
+## YES＋NO 为什么不总显示为 100
+
+“一个发生、一个不发生，概率相加当然应该等于 100。”逻辑没有错，容易错的是**把屏幕上的两个数字当成了同一种价格**。
+
+- **最近成交价**记录两个不同时间点最后发生的交易，YES 可能刚在 62 成交，而 NO 的 45 是十分钟前留下的。
+- **中间价**是各自买一和卖一的平均值，未必有任何人愿意让你按它成交。
+- **卖一价**是你买入要付的钱。YES 卖一 62、NO 卖一 45，买齐要 107；这反映两次价差成本，不是 107% 的一致信念。
+- **买一价**是你卖出能收到的钱。若 YES 买一 62、NO 买一 45，而且能同时成交，才可能出现“锁 100、拆一套、卖 107”的方向。
+
+<Concept title="先问：这个数字能不能成交？">
+<p>“显示概率相加超过或低于 100”只是线索。套利比较的必须是同一时刻、同一数量的可执行报价：买两边看卖一，卖两边看买一。把最近成交价、中间价和可执行价混在一起，会创造并不存在的免费午餐。</p>
+</Concept>
+
+<ComplementArbitrageLab />
+
+小于 100 的逻辑尤其直观：假设 YES 可买 46，NO 可买 47。各买一份只花 93，但最终无论结果是哪边，完整份额都能取回 100，毛差是 7。可真正执行前，还要减去手续费、Gas、滑点和资金占用，并确认合约不会进入无效结果。
+
+超过 100 则必须分方向看。若 62 和 45 都是**可买价**，买齐会花 107、最终只回 100；若它们都是足量的**可卖价**，且你能用 100 抵押拆出一套 YES＋NO，卖出后才有 7 的毛差。
+
+### 四种常见扭曲
+
+- **流动性不足**：订单之间间隔很远，小额交易也会造成巨大价格跳动。
+- **风险与偏好**：某人可能愿意为保险支付高于期望值的价格，并非他真的认为概率更高。
+- **参与者受限**：掌握信息的人可能因为地区、资金或规则限制无法交易。
+- **操纵与展示**：大额订单可以暂时推动价格，尤其是在缺乏套利者时。
+
+<Think>
+<p>一个市场只有两名参与者，最近成交价从 52 跳到 88。你还需要看到哪些信息，才会认真对待这个变化？</p>
+</Think>
+
+## 先看价差和深度，再看大数字
+
+单独展示“YES 70%”很容易制造过度确定感。一个负责任的界面还应该告诉用户：买一与卖一分别是多少、附近有多少数量、最后一笔交易有多大、价格多久没有更新。
+
+因此我们的实验室把它标记为**隐含市场价格**，同时展示价差、未平仓份额和场景状态，不把单个数字伪装成事实。
+
+<MechanismDetails>
+
+```text
+displayPrice = lastTrade
+  ?? midpoint(bestBid, bestAsk)
+  ?? bestAvailableQuote
+  ?? 50
+
+标签必须说明价格来源；无成交时不能把中点写成“最新成交”。
+```
+
+</MechanismDetails>
+
+<Checkpoint
+  id="price-not-truth"
+  question="YES 最近成交价为 70，下面哪句话最准确？"
+  options={["事件客观上有且只有 70% 概率", "在当前市场条件下，最近有交易愿意在 70 成交，可把它谨慎地读作隐含概率", "最终结果有 70% 会被预言机写成 YES"]}
+  correctIndex={1}
+  explanation="价格包含信息，也受到市场结构影响；它既不是客观概率，也不能决定预言机结果。"
+/>
+
+## 本章小结
+
+我们已经知道如何读取价格，却还没有让现实进入系统。最后一章会处理预测市场最容易被忽略的依赖：谁来报告结果，错误报告又如何被纠正？
+
+<SourceList>
+
+- [Polymarket：价格与订单簿](https://docs.polymarket.com/concepts/prices-orderbook)
+- [Polymarket：结果份额的拆分与合并](https://docs.polymarket.com/concepts/positions-tokens)
+- [Gnosis Conditional Tokens：完整份额的拆分与合并](https://gnosis-conditional-tokens.readthedocs.io/en/latest/developer-guide.html)
+- [CFTC：Prediction Markets 相关研究与政策资料](https://www.cftc.gov/LawRegulation/DoddFrankAct/Rulemakings/DF_15_EventContracts/index.htm)
+
+</SourceList>

@@ -1,0 +1,45 @@
+import { LessonLead, Concept, Think, MechanismDetails, Checkpoint, SourceList } from "@/platform/components/LessonPrimitives"
+import { GovernanceLab } from "@/modules/governance/components/GovernanceLab"
+
+<LessonLead>
+A passed vote is not the end. A timelock creates a public countdown between agreement and mutation, giving members, monitors, and integrators a chance to notice a bad operation and react.
+</LessonLead>
+
+## Four states, four permissions
+
+After success, a proposal is queued. After two days it becomes ready. Only ready proposals can execute. Each state makes a different action legal or illegal.
+
+<GovernanceLab focus="timelock" locale="en" />
+
+Try to execute immediately after the vote and read the error. Then queue, advance the clock, and execute the fee change. The timeline records approval, waiting, and the state write.
+
+<Concept title="A timelock is observable delay, not magic insurance">
+<p>It improves reaction time but cannot judge whether a proposal is benevolent. Monitoring, a cancellation path, upgrade controls, and communication still matter.</p>
+</Concept>
+
+<Think><p>If queued calldata is found to be wrong, who should cancel it—and how does that cancellation role avoid becoming a new single point of failure?</p></Think>
+
+<MechanismDetails>
+
+```text
+succeeded → queue(operation, salt, eta)
+eta reached → ready
+executor calls target only when ready
+```
+
+Real systems hash the operation and enforce predecessor, timestamp, and caller rules. This lab models the same boundary as `queuedAt + timelockDelay` and records every event for replay.
+
+</MechanismDetails>
+
+<Checkpoint
+  id="governance-timelock"
+  question="What does a timelock directly provide?"
+  options={["An observable, cancellable reaction window between approval and execution", "A guarantee that every parameter is correct", "A bypass that lets any address edit the protocol"]}
+  correctIndex={0}
+  explanation="A delay exposes the operation and buys time; it does not replace review or access control."
+/>
+
+<SourceList>
+- [OpenZeppelin TimelockController](https://docs.openzeppelin.com/contracts/5.x/api/governance#TimelockController)
+- [Ethereum.org: DAOs](https://ethereum.org/en/dao/)
+</SourceList>

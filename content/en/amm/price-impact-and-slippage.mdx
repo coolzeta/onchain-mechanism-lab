@@ -1,0 +1,64 @@
+import { LessonLead, Concept, Think, MechanismDetails, Checkpoint, SourceList } from "@/platform/components/LessonPrimitives"
+import { AMMLab } from "@/modules/amm/components/AMMLab"
+
+<LessonLead>
+A trade’s “price” can mean the pre-trade spot price, the average execution price, or the output after fees. Compare three swap sizes and separate these numbers instead of treating them as one quote.
+</LessonLead>
+
+## One pool, three sizes
+
+Choose a small, medium, and large input. Does output scale linearly? Does price impact stay constant? Does the fee grow in proportion to input?
+
+<AMMLab locale="en" focus="slippage" />
+
+With 120,000 credits and 1,000 TOKEN, the pre-trade spot price is about 120 credits per TOKEN. It is a tangent to the curve, not a promise that any quantity can trade at 120.
+
+<Concept title="Execution price is an average, not the last marginal price">
+<p>As the swap walks along the curve, early TOKEN is cheaper and later TOKEN is scarcer. Input divided by output gives the average execution price, which is usually worse than the pre-trade spot price.</p>
+</Concept>
+
+## Depth determines impact
+
+Buying TOKEN raises credit reserves and lowers TOKEN reserves. In a small pool, the same order is a larger fraction of depth, so the curve moves farther. This is why useful liquidity means assets near the current price, not only total value locked.
+
+<Think>
+<p>If input grows from 1,200 to 12,000, will output grow exactly ten times? Record both quotes, then point to the reserve constraint that creates the difference.</p>
+</Think>
+
+## Fees and price impact are different costs
+
+The fee is a fixed percentage removed before the curve calculation. Price impact comes from moving along the curve and depends on depth and trade size. Setting the fee to zero does not make a large swap execute at spot.
+
+<MechanismDetails>
+
+```text
+fee = floor(amountIn × feeBps / 10,000)
+usableIn = amountIn - fee
+amountOut = reserveOut × usableIn / (reserveIn + usableIn)
+executionPrice = amountIn / amountOut
+priceImpact = executionPrice / spotPriceBefore - 1
+```
+
+Real protocols ask for `amountOutMinimum` or a maximum slippage. That protects the output boundary; it does not freeze the pool price.
+
+</MechanismDetails>
+
+<Checkpoint
+  id="amm-slippage"
+  question="Why does zero fee still not make a large swap execute at the old spot price?"
+  options={["Price impact comes from moving along the reserve curve; it is separate from the fee", "The AMM randomly changes the trader balance", "Zero fees make the pool stop quoting"]}
+  correctIndex={0}
+  explanation="A fee changes usable input, but a large swap still changes the reserve ratio. Average execution therefore moves away from the pre-trade spot price."
+/>
+
+## Read slippage protection as a safety boundary
+
+A real call says more than “swap 12,000 credits”: it also says “I must receive at least this much TOKEN.” If someone trades first, the quote can worsen. Below the minimum, the transaction should fail instead of silently accepting a worse fill.
+
+<SourceList>
+
+- [Uniswap v2: How Uniswap works](https://docs.uniswap.org/contracts/v2/concepts/protocol-overview/how-uniswap-works)
+- [Uniswap v2: Trades](https://docs.uniswap.org/contracts/v2/concepts/protocol-overview/trades)
+- [Uniswap v2: Fees](https://docs.uniswap.org/contracts/v2/concepts/protocol-overview/fees)
+
+</SourceList>

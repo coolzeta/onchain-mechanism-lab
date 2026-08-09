@@ -1,0 +1,68 @@
+import { LessonLead, Concept, Think, MechanismDetails, Checkpoint, SourceList } from "@/platform/components/LessonPrimitives"
+import { MatchingEngineLab } from "@/modules/matching-engine/components/MatchingEngineLab"
+
+<LessonLead>
+市价单把“现在就成交”放在第一位，把价格交给盘口。它看起来比限价单简单，却更依赖市场深度：同一笔订单可能在多个价格档位成交，平均执行价也可能和第一眼看到的卖一完全不同。
+</LessonLead>
+
+## 不指定价格，不等于没有价格
+
+实验室里的市价单只承诺一件事：尽量立即成交。它会从卖一开始逐档吃掉可用数量，直到订单完成或盘口没有更多对手方。每一笔成交仍然有明确价格，只是这些价格来自等待中的卖单。
+
+<MatchingEngineLab focus="market" />
+
+<Concept title="限价单保护价格，市价单优先保护时间">
+<p>买入限价 104 分表示“最多付 104”；市价买入则表示“只要当前盘口有卖方，就按可用价格成交”。在生产系统中，市价单通常还会带有保护带、最大金额或滑点限制，避免薄盘口把订单推到意外价格。</p>
+</Concept>
+
+## 一笔订单可以跨过多个档位
+
+初始卖盘在 102 分有 5 LAB，在 105 分还有 5 LAB。市价买入 8 LAB 会先拿走 102 分的 5 LAB，再从 105 分拿走 3 LAB。它不是“以 102 分买 8 份”，而是两条不同的成交记录。
+
+平均执行价是所有成交金额除以成交数量。在这个例子里，平均价会高于 102 分；差异来自深度，不是手续费，也不是引擎随机改变了报价。
+
+<Think>
+<p>把深度探针从 5 调到 8。前 5 份为什么没有价格冲击，后 3 份为什么必须跨到 105？如果卖一只有 1 份，哪怕订单总量很小，平均价还会稳定吗？</p>
+</Think>
+
+## IOC 剩余数量不会悄悄排队
+
+市价单的教学实现采用 IOC（Immediate-Or-Cancel）：能立即成交的部分完成，找不到对手方的部分立即取消。这样“我愿意现在成交”和“我愿意挂在盘口等待”被明确区分。
+
+<MechanismDetails>
+
+```text
+for ask in asks sorted by price, time:
+  fill = min(order.remaining, ask.remaining)
+  settle(at=ask.price, quantity=fill)
+  if order.remaining == 0: break
+cancel(order.remaining)
+```
+
+真实交易系统还要检查余额、价格保护、风控限额和撮合批次。实验室把这些结果写进执行摘要：请求数量、已成交数量、未成交数量和平均成交价，方便你从状态而不是动画判断发生了什么。
+
+</MechanismDetails>
+
+<Checkpoint
+  id="engine-market-depth"
+  question="市价买入 8 LAB 后，为什么平均执行价会高于卖一 102 分？"
+  options={["因为市价单会自动收取一笔隐藏手续费", "因为 102 分的卖单数量不够，剩余数量跨到了更高的价格档位", "因为撮合引擎会随机选择成交价格"]}
+  correctIndex={1}
+  explanation="市价单按可用卖盘逐档成交。前 5 LAB 在 102 分成交，剩余 3 LAB 需要从 105 分档位拿到，所以总金额除以 8 后高于卖一。"
+/>
+
+## 用三个问题读懂市价单
+
+1. 订单是在保护价格，还是保护立即成交？
+2. 当前卖一有多少数量，下一档价格在哪里？
+3. 未成交的数量是继续等待，还是按 IOC 规则被取消？
+
+这三个问题同样适用于交易所、链上订单簿和清算系统。市价单不是“没有价格”，而是把价格选择权交给了当前可见的流动性。
+
+<SourceList>
+
+- [Nasdaq：Market Order](https://www.nasdaq.com/glossary/m/market-order)
+- [Coinbase Exchange：订单类型](https://docs.cdp.coinbase.com/exchange/concepts/orders)
+- [FIX Trading Community：订单执行类型](https://www.fixtrading.org/standards/)
+
+</SourceList>

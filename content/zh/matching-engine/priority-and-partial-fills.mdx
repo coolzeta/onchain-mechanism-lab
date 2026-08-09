@@ -1,0 +1,92 @@
+import { LessonLead, Concept, Think, MechanismDetails, Checkpoint, SourceList } from "@/platform/components/LessonPrimitives"
+import { MatchingEngineLab } from "@/modules/matching-engine/components/MatchingEngineLab"
+
+<LessonLead>
+订单簿不是一个“把价格排序”的表格，而是一条需要在每次状态变化后仍然可验证的队列。撮合引擎要决定谁先成交、成交多少、用什么价格，以及剩余资产应该继续等待还是被释放。
+</LessonLead>
+
+## 先读懂买一和卖一
+
+实验室的交易对是虚拟的 **LAB / 积分**。卖单按价格从低到高排，买单按价格从高到低排：
+
+- **卖一（best ask）**：当前最低的卖价。
+- **买一（best bid）**：当前最高的买价。
+- **价差（spread）**：卖一减去买一，代表立即成交要跨过的空间。
+
+只要买一低于卖一，订单簿就没有交叉，撮合引擎会停在这里。新订单可以排队，也可以把自己的限价带进盘口，让买价大于等于卖价，从而触发撮合。
+
+<MatchingEngineLab />
+
+<Concept title="限价是你的边界，不是系统承诺给你的成交价">
+<p>买入限价 104 分表示你最多愿意付 104；如果队列里有 102 分的卖单，成交会优先使用 102。卖出限价 99 分表示你至少愿意收 99；如果买方愿意付 101，成交可以按静止买单的 101 发生。</p>
+</Concept>
+
+## 价格优先之后，才轮到时间优先
+
+盘口里有两个卖单都在 102 分：Maker A 先挂 2 LAB，Maker B 后挂 3 LAB。你提交买入 6 LAB @104 后，系统不会把它们随机打散，而是先成交 A 的 2，再成交 B 的 3。
+
+这就是价格优先、时间优先：先选更有利的价格；同一价格再选更早进入队列的订单。排序必须稳定，事件日志也必须保留序号，否则相同输入可能产生不同余额和不同的结算结果。
+
+<Think>
+<p>把买入数量从 6 调成 1、再调成 6。为什么第二种情况下最近成交价仍然是 102，而你剩余的一份订单停在 104？先看队列里还有多少 102 的卖单。</p>
+</Think>
+
+## 一笔大单不一定一次成交完
+
+你买入 6 LAB @104，但盘口只有 5 LAB 的卖单价格不超过 104：两个 102 分订单共 5 LAB。引擎会生成两条成交记录，剩余 1 LAB 继续以 104 分挂在买方队列。
+
+部分成交非常重要，因为它把“订单意图”和“成交事实”分开了：原订单数量是 6，已成交数量是 5，剩余数量是 1。撤销时只能释放那 1 份对应的冻结积分，不能改写已经发生的成交。
+
+<MechanismDetails>
+
+```text
+while bestBid.price >= bestAsk.price:
+  quantity = min(bestBid.remaining, bestAsk.remaining)
+  maker = earlier(bestBid, bestAsk)
+  price = maker.price
+
+  settle(buyer, seller, price, quantity)
+  bestBid.remaining -= quantity
+  bestAsk.remaining -= quantity
+  append(trade, price, quantity, maker)
+```
+
+生产系统还会加入自成交保护、最小价格变动、撮合批次、风控限额和断路器。教学内核只保留最小规则，但每个规则都能在状态、事件和不变量里找到对应证据。
+
+实验室也会阻止一个账户用自己的买单和卖单互相成交：新进入的那张订单会被取消，冻结资产随之释放。不同交易所会提供不同的自成交保护模式，但“不能把自己的报价伪装成真实市场需求”是一个重要的边界。
+
+</MechanismDetails>
+
+## 队列规则也是一种公平性设计
+
+价格时间优先并不是自然法则，而是一种市场设计选择。它让参与者知道“更好的价格、同价位更早的时间”会获得优先权；另一种设计也可能采用按比例分配、批量拍卖或随机排序。
+
+当你比较订单簿和 AMM 时，差异不只是界面不同：订单簿把流动性拆在一个个等待中的订单里，AMM 把报价写进曲线。前者需要队列和撮合，后者需要储备和不变量。
+
+<Checkpoint
+  id="engine-priority"
+  question="为什么你提交买入 6 LAB @104 后，只成交 5 LAB，剩下 1 LAB 继续挂在 104？"
+  options={["引擎随机丢了一份订单", "只有 5 LAB 的卖单价格不高于 104，剩余数量没有对手方", "限价单永远只能成交一份"]}
+  correctIndex={1}
+  explanation="限价只允许在不差于边界的价格成交。盘口里的两个 102 分卖单合计 5 LAB，104 分以上没有卖单，所以剩余 1 LAB 必须继续排队。"
+/>
+
+## 用五个问题检查一个撮合引擎
+
+走完实验后，试着解释：
+
+1. 当前买一、卖一和价差是多少？
+2. 两个同价订单为什么有先后？
+3. 成交价为什么来自静止订单，而不是新订单的限价？
+4. 部分成交后，订单、余额和冻结资产分别如何变化？
+5. 撤单为什么只能改变未来状态，不能抹掉历史成交？
+
+这些问题是中心化交易所、链上订单簿和预测市场共享的骨架。理解它们之后，再研究批量拍卖、MEV 或清算，会有一套可以反复验证的状态语言。
+
+<SourceList>
+
+- [Nasdaq：订单类型与限价单基础](https://www.nasdaq.com/glossary/l/limit-order)
+- [Coinbase Exchange：订单类型与撮合说明](https://docs.cdp.coinbase.com/exchange/concepts/orders)
+- [Ethereum.org：去中心化交易所与订单簿](https://ethereum.org/defi/#decentralized-exchanges-dex)
+
+</SourceList>

@@ -1,0 +1,75 @@
+import { LessonLead, Concept, Think, MechanismDetails, Checkpoint, SourceList } from "@/platform/components/LessonPrimitives"
+import { QuestionBuilder } from "@/modules/prediction-markets/components/QuestionBuilder"
+
+<LessonLead>
+A prediction market does not start with a bet. It starts with a contract about the future. If the sentence cannot be judged as YES or NO at a defined moment, the price, trade, and payout have no shared foundation.
+</LessonLead>
+
+## Meet the question in our lab
+
+Alice thinks humans will return to the Moon soon. Bob expects another delay. That disagreement sounds like a market: Alice buys YES and Bob buys NO. But what does “soon” mean? Does a probe count? What if a commercial livestream conflicts with an official mission report?
+
+These are not copywriting details. They define the asset itself. A YES share can pay only if everyone agrees what the share means.
+
+<Think>
+<p>Why is “Will an AI model pass the Turing test next year?” difficult to settle? Find at least two undefined terms.</p>
+</Think>
+
+## Three anchors make a rule executable
+
+1. **Deadline**: when observation ends, including the time zone.
+2. **Observable event**: what must happen, rather than what people generally believe happened.
+3. **Resolution source**: which public source wins if evidence conflicts.
+
+<QuestionBuilder locale="en" />
+
+<Concept title="A market trades a resolution rule, not a headline">
+<p>Two markets can have the same short title and still be different assets if their full rules differ. The rule text is the shared interface between traders, the oracle, and the payout code.</p>
+</Concept>
+
+## Write edge cases before trading starts
+
+Reality does not always provide a polite YES or NO. A mission may launch before the deadline but land after it. An official source may be unavailable. An event may be cancelled or redefined. A mature market states in advance:
+
+- how delayed data is handled;
+- whether cancellation or source failure makes the market invalid and refunds collateral;
+- who may dispute a report and for how long;
+- which source wins when records conflict.
+
+Without these rules, participants are not buying the same risk and the displayed price has no common meaning.
+
+<MechanismDetails>
+
+```text
+MarketRule {
+  question
+  closeTime
+  resolutionTime
+  source
+  yesCondition
+  invalidCondition
+}
+
+Only a complete rule can move from DRAFT to OPEN.
+```
+
+</MechanismDetails>
+
+<Checkpoint
+  id="question-contract"
+  question="Which market question is closest to being directly settleable?"
+  options={["Will Bitcoin perform well next year?", "By 2028-12-31, will a named official mission report confirm a human touched the lunar surface?", "When will AI surpass humans?"]}
+  correctIndex={1}
+  explanation="It names a deadline, an observable event, and a source. The other questions still depend on subjective interpretation."
+/>
+
+## State passed to the next lesson
+
+We now have a binary contract every participant can read the same way. Next we ask where the winner's 100 credits come from, even when the losing trader disappears.
+
+<SourceList>
+
+- [Polymarket: markets and events](https://docs.polymarket.com/market-data/overview)
+- [Gnosis Conditional Tokens: conditions and outcomes](https://gnosis-conditional-tokens.readthedocs.io/)
+
+</SourceList>

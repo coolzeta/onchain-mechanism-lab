@@ -1,0 +1,62 @@
+import { LessonLead, Concept, Think, MechanismDetails, Checkpoint, SourceList } from "@/platform/components/LessonPrimitives"
+import { MEVLab } from "@/modules/mev/components/MEVLab"
+
+<LessonLead>
+A sandwich is not simply “the pool was hacked.” It uses public intent and the AMM curve: a searcher changes reserves before the user, lets the user execute in the worse state, then sells back to turn part of the price impact into extraction.
+</LessonLead>
+
+## Put three trades in one order
+
+In a plain public scenario, a block may contain only the user swap. In a sandwich, the searcher proposes:
+
+1. Front-run buy: consume some TOKEN depth first;
+2. User swap: execute against the new reserves;
+3. Back-run sell: sell the TOKEN bought in front.
+
+<MEVLab focus="sandwich" locale="en" />
+
+Compare the user's quoted output with actual output. A loose minimum-output guard accepts a worse fill; a tight guard reverts the user trade, so the searcher cannot treat a failed transaction as a completed sale.
+
+<Concept title="Slippage protection is a failure condition, not a price guarantee">
+<p>Minimum output says “do not execute below this result.” It does not guarantee a fill or freeze the pool; it turns an unacceptable state into a revert.</p>
+</Concept>
+
+<Think>
+<p>If tight protection reverts, what did the user pay? Usually a failed-attempt network cost, not a worse TOKEN fill. Keep failed execution cost separate from extracted value.</p>
+</Think>
+
+<MechanismDetails>
+
+```text
+front = swap(searcher, X → Y)
+victim = quote(pool_after_front, X → Y)
+if victim.amountOut < victim.minOut:
+    revert(victim)
+else:
+    execute(victim)
+back = swap(searcher, Y → X)
+```
+
+Production protocols also handle atomicity, gas auctions, private bundles, router minimums, and multi-pool routes. This lab keeps the smallest state machine that makes the asset flow visible.
+
+</MechanismDetails>
+
+<Checkpoint
+  id="mev-sandwich-slippage"
+  question="What does a minimum-output guard protect in a sandwich?"
+  options={["It guarantees execution and freezes the price", "It reverts the trade below the acceptable output instead of silently accepting a worse result", "It automatically sends the searcher's profit to the user"]}
+  correctIndex={1}
+  explanation="The guard is an execution condition, not a fixed price. If ordering pushes output below the boundary, the trade reverts; it does not guarantee success or redistribute profit."
+/>
+
+## Read one extraction on one ledger
+
+Keep the user's missing TOKEN, the searcher's credit change, pool fees, and the proposer's possible ordering tip together. Otherwise every negative price impact looks like the same kind of attack.
+
+<SourceList>
+
+- [Uniswap: trades and slippage](https://docs.uniswap.org/contracts/v2/concepts/protocol-overview/trades)
+- [Flashbots: understanding bundles](https://docs.flashbots.net/flashbots-auction/searchers/understanding-bundles)
+- [Ethereum.org: gas and transaction fees](https://ethereum.org/en/developers/docs/gas/)
+
+</SourceList>

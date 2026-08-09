@@ -1,0 +1,46 @@
+import { LessonLead, Concept, Think, MechanismDetails, Checkpoint, SourceList } from "@/platform/components/LessonPrimitives"
+import { GovernanceLab } from "@/modules/governance/components/GovernanceLab"
+
+<LessonLead>
+Governance eventually touches assets: treasury credits, protocol parameters, and pause switches. A low quorum can make decisions faster while letting fewer participants control more value; an emergency cancellation path creates another authority boundary.
+</LessonLead>
+
+## Put a treasury grant on the same ledger
+
+A 180,000-credit grant moves only when execution runs. Voting, queuing, and waiting do not create balances. Switch to the low-quorum scenario to see why participation is a security boundary, not merely an efficiency metric.
+
+<GovernanceLab focus="treasury" locale="en" />
+
+Run the ordinary grant, then reset into low quorum and timelock cancellation. Read treasury balance, recipient balance, and event log together.
+
+<Concept title="Security parameters are a coupled set of knobs">
+<p>Quorum controls participation, majority controls support, timelock controls reaction time, and the guardian controls emergency stop. Raising one does not automatically make the whole system safer.</p>
+</Concept>
+
+<Think><p>If quorum is very low, who pays the cost when token concentration, absent voters, or borrowed voting power turns speed into an attack surface?</p></Think>
+
+<MechanismDetails>
+
+```text
+treasury_before + member_credits_before
+  = treasury_after + member_credits_after
+
+cancel(queued | ready) → no transfer, proposal becomes cancelled
+```
+
+Cancellation does not erase votes or rewrite history; it blocks the call before assets move. Production systems also need guardian rotation, expiry, and spending limits.
+
+</MechanismDetails>
+
+<Checkpoint
+  id="governance-treasury"
+  question="What does governance do here?"
+  options={["It authorizes parameter or asset actions through a vote and timelock", "It determines whether an outside event is objectively true", "It only displays a sentiment percentage"]}
+  correctIndex={0}
+  explanation="Governance authorizes state changes. An oracle answers external facts; the two roles should not be conflated."
+/>
+
+<SourceList>
+- [Safe: What is a Safe?](https://help.safe.global/en/articles/40827-what-is-a-safe)
+- [OpenZeppelin Governance](https://docs.openzeppelin.com/contracts/5.x/governance)
+</SourceList>

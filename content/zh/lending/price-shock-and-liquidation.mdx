@@ -1,0 +1,64 @@
+import { LessonLead, Concept, Think, MechanismDetails, Checkpoint, SourceList } from "@/platform/components/LessonPrimitives"
+import { LendingLab } from "@/modules/lending/components/LendingLab"
+
+<LessonLead>
+清算不是协议突然没收一切，而是一条预先写好的风险边界：当抵押品按预言机价格已经不足以覆盖安全阈值，清算人偿还部分或全部债务，换取一份带奖励的抵押品。
+</LessonLead>
+
+## 清算价格可以先算出来
+
+假设抵押品数量不变，清算价格近似为：
+
+> `债务 ÷（抵押品数量 × 清算阈值）`
+
+这不是预测价格，而是把当前债务和协议阈值转换成一个“如果价格到这里，健康度将变成 1.00”的警报线。真正执行时还会考虑奖励、拍卖深度、手续费和交易延迟。
+
+<LendingLab focus="liquidation" />
+
+## 清算人的激励从哪里来
+
+清算人不是慈善机构。它用自己的积分偿还债务，然后取得抵押品，并获得例如 5% 的清算奖励。奖励是为了补偿 gas、价格波动和执行风险；奖励太低可能没人来，太高则会让借款人的损失变大。
+
+<Concept title="清算把一笔风险转移成两笔可验证的状态变化">
+<p>第一步是债务减少、协议流动性增加；第二步是借款人的抵押品减少、清算人的抵押品增加。清算奖励不是凭空铸币，而是从被处置的抵押品价值中支付。</p>
+</Concept>
+
+<Think>
+<p>如果健康度已经是 0.92，但清算人没有足够资金或市场深度很薄，协议会自动创造一笔钱来补缺口吗？如果不会，风险会落在哪里？</p>
+</Think>
+
+<MechanismDetails>
+
+```text
+require healthFactor < 1.00
+repay = min(debt, collateralValue / (1 + liquidationBonus))
+seize = repay * (1 + liquidationBonus) / oraclePrice
+
+liquidator.cash -= repay
+protocol.liquidity += repay
+borrower.debt -= repay
+borrower.collateral -= seize
+```
+
+如果所有抵押品都被处置后仍有债务，剩余部分就不是“被隐藏的损失”，而是坏账，需要由协议储备、保险或其他参与者承担。
+
+</MechanismDetails>
+
+<Checkpoint
+  id="lending-liquidation-boundary"
+  question="健康度跌破 1.00 时，清算人主要做什么？"
+  options={["用自己的资产偿还债务，并按规则接收抵押品", "把抵押品价格强行改回原来的价格", "让借款人的债务自动消失但不发生任何资产转移"]}
+  correctIndex={0}
+  explanation="清算是一个有资产流向的状态转换：清算人偿债，抵押品转移，奖励从被处置的抵押品中支付。"
+/>
+
+## 本章小结
+
+清算边界已经可以计算，但它依赖一个关键输入：协议相信的价格。下一章把市场价格和预言机价格拆开，看滞后输入如何制造坏账。
+
+<SourceList>
+
+- [Aave：Liquidations](https://aave.com/help/borrowing/liquidations)
+- [Chainlink：价格数据与预言机风险](https://chain.link/education-hub/defi-lending)
+
+</SourceList>

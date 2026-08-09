@@ -1,0 +1,63 @@
+import { LessonLead, Concept, Think, MechanismDetails, Checkpoint, SourceList } from "@/platform/components/LessonPrimitives"
+import { LendingLab } from "@/modules/lending/components/LendingLab"
+
+<LessonLead>
+A lending protocol does not turn “value” into cash from nowhere. It accepts collateral that can be verified and liquidated, then lends below 100% of its value. The discount leaves room for volatility, execution cost, and liquidation time.
+</LessonLead>
+
+## Three different numbers in one loan
+
+Suppose you deposit 100 TOKEN and the oracle reports 120 credits per TOKEN. The book value is 12,000 credits, but that is not your borrowing capacity:
+
+- **Collateral value**: value estimated from the current oracle price.
+- **LTV**: the maximum share of collateral value that can become debt.
+- **Protocol liquidity**: credits the pool can actually lend right now.
+
+This lab uses a 75% maximum LTV, so the safe capacity is at most 9,000 credits. It is neither TOKEN’s “true price” nor a promise that you can repay later.
+
+<LendingLab locale="en" focus="collateral" />
+
+<Concept title="Collateral is a risk buffer, not free credit">
+<p>The protocol locks an asset so it can still be sold if a borrower cannot repay. Lower LTV means more buffer; higher LTV improves capital efficiency but reaches liquidation faster when price falls.</p>
+</Concept>
+
+## Capacity is also limited by pool balance
+
+Even with enough collateral, the lending pool may not have enough credits. A responsible interface shows both “your capacity” and “pool liquidity”; otherwise users can mistake a risk boundary for a withdrawable balance.
+
+<Think>
+<p>If collateral is worth 12,000 and max LTV is 75%, but the pool has only 2,000 credits left, should the account show 9,000 or 2,000 available? Why?</p>
+</Think>
+
+<MechanismDetails>
+
+```text
+collateralValue = deposited * oraclePrice
+borrowCapacity = collateralValue * maxLTV
+available = min(borrowCapacity - debt, poolLiquidity)
+
+borrow(amount):
+  require amount <= available
+  debt += amount
+  poolLiquidity -= amount
+  userCash += amount
+```
+
+Borrowing creates a liability between the account and protocol. It does not change the collateral’s market price or remove risk.
+
+</MechanismDetails>
+
+<Checkpoint
+  id="lending-collateral-capacity"
+  question="100 TOKEN is worth 12,000 credits and max LTV is 75%. If pool liquidity is sufficient, how much can be borrowed?"
+  options={["12,000, because that is the collateral value", "9,000, because only 75% of value can become debt", "3,000, because only one quarter can be borrowed"]}
+  correctIndex={1}
+  explanation="LTV caps debt relative to collateral value. The remaining 25% absorbs price movement and liquidation friction."
+/>
+
+<SourceList>
+
+- [Aave: Borrowing and health factor](https://aave.com/help/borrowing/health-factor)
+- [Compound: Protocol documentation](https://docs.compound.finance/)
+
+</SourceList>

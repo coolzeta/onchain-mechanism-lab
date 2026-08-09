@@ -1,0 +1,91 @@
+import { LessonLead, Concept, Think, MechanismDetails, Checkpoint, SourceList } from "@/platform/components/LessonPrimitives"
+import { ProbabilityLab } from "@/modules/prediction-markets/components/ProbabilityLab"
+import { ComplementArbitrageLab } from "@/modules/prediction-markets/components/ComplementArbitrageLab"
+
+<LessonLead>
+A YES share redeems 100 at resolution, so a trade at 70 is often read as “the market thinks the event is about 70% likely.” That is useful intuition, but it is an interpretation—not a fact written by the system.
+</LessonLead>
+
+## Why price can resemble implied probability
+
+Ignoring fees, funding costs, and personal preferences, a 70% belief gives a YES share an expected payout near 70. Below 70, buying may look attractive; above 70, a trader may prefer NO.
+
+When many people with different information act this way, orders can compress scattered judgments into a price. The market's distinctive feature is that participants put budgets behind those judgments.
+
+<Concept title="Price is a conditional signal">
+<p>A more accurate sentence is: “Under these rules, participants, funds, liquidity, and trading costs, the latest trade occurred at 70.” Reading it as probability must keep those conditions visible.</p>
+</Concept>
+
+## The same 0.70 can come from different markets
+
+<ProbabilityLab locale="en" />
+
+## Why YES + NO does not always display as 100
+
+“One event happens and the other does not, so the probabilities must sum to 100.” The logic is sound. The usual mistake is treating two screen numbers as the same kind of price.
+
+- **Last trades** may come from different moments. YES might have traded at 62 now while NO 45 is ten minutes old.
+- **Midpoints** average each side’s bid and ask; nobody has promised to trade at them.
+- **Asks** are what you pay to buy. YES ask 62 plus NO ask 45 means a complete set costs 107; that includes paying two spreads, not a 107% consensus.
+- **Bids** are what you receive when selling. If executable YES and NO bids are 62 and 45, that may support the opposite trade: lock 100, split one set, and sell it for 107.
+
+<Concept title="Ask first: can this number execute?">
+<p>A displayed sum above or below 100 is only a clue. Arbitrage must compare simultaneous executable quotes for the same size: use asks when buying both sides and bids when selling both sides. Mixing last trades, midpoints, and executable quotes invents a free lunch that may not exist.</p>
+</Concept>
+
+<ComplementArbitrageLab locale="en" />
+
+The below-100 loop is intuitive. If YES can be bought at 46 and NO at 47, the pair costs 93 but the complete set returns 100 regardless of the winner—a gross edge of 7. Real execution must subtract fees, gas, slippage, and capital costs, while confirming the contract cannot fall into an invalid outcome.
+
+Above 100 needs direction. If 62 and 45 are both **asks**, buying the pair costs 107 and returns only 100. If they are sufficiently deep **bids**, and 100 collateral can be split into YES + NO, selling the pair may produce a gross edge of 7.
+
+Common distortions include:
+
+- **Thin liquidity**: a small order can move a wide book.
+- **Risk and preference**: someone may pay above expected value to hedge a different exposure.
+- **Restricted participation**: informed people may be unable or unwilling to trade.
+- **Manipulation and display**: a large order can temporarily move the quote when arbitrage is weak.
+
+<Think>
+<p>If a market has only two participants and the last price jumps from 52 to 88, what else would you inspect before trusting the move?</p>
+</Think>
+
+## Inspect spread and depth before the large number
+
+Showing only “YES 70%” creates false certainty. A responsible interface also exposes the best bid and ask, nearby quantity, the size of the last trade, and how long ago the price updated.
+
+Our lab labels the number **implied market price**, and shows spread, open interest, and scenario state instead of disguising one trade as reality.
+
+<MechanismDetails>
+
+```text
+displayPrice = lastTrade
+  ?? midpoint(bestBid, bestAsk)
+  ?? bestAvailableQuote
+  ?? 50
+
+Always label the price source. A midpoint with no trade is not a latest trade.
+```
+
+</MechanismDetails>
+
+<Checkpoint
+  id="price-not-truth"
+  question="The latest YES trade is 70. Which statement is most accurate?"
+  options={["The event objectively has exactly a 70% chance", "Under current market conditions, a trade occurred at 70; it can be read cautiously as an implied probability", "The oracle will write YES with a 70% probability"]}
+  correctIndex={1}
+  explanation="Price contains information and market-structure effects. It is neither objective probability nor the oracle result."
+/>
+
+## State passed to the next lesson
+
+We know how to read a price, but reality has not entered the system yet. The final lesson asks who reports the result and how a wrong report can be challenged.
+
+<SourceList>
+
+- [Polymarket: prices and order books](https://docs.polymarket.com/concepts/prices-orderbook)
+- [Polymarket: splitting and merging outcome positions](https://docs.polymarket.com/concepts/positions-tokens)
+- [Gnosis Conditional Tokens: splitting and merging complete sets](https://gnosis-conditional-tokens.readthedocs.io/en/latest/developer-guide.html)
+- [CFTC: prediction market research and policy material](https://www.cftc.gov/LawRegulation/DoddFrankAct/Rulemakings/DF_15_EventContracts/index.htm)
+
+</SourceList>

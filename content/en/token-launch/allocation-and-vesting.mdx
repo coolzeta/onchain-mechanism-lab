@@ -1,0 +1,63 @@
+import { LessonLead, Concept, Think, MechanismDetails, Checkpoint, SourceList } from "@/platform/components/LessonPrimitives"
+import { TokenLaunchLab } from "@/modules/token-launch/components/TokenLaunchLab"
+
+<LessonLead>
+An allocation table says who is meant to own units; a vesting schedule says when those units can be used. They are not the same field. Collapse them into one balance and learners—and markets—misread future supply pressure.
+</LessonLead>
+
+## One allocation has four states
+
+Creator and community vesting already count toward total supply, but cannot transfer their locked units. Advancing the phase only increases the **claimable amount**; a claim action moves units into a liquid balance.
+
+<TokenLaunchLab locale="en" focus="vesting" />
+
+Ask four questions about any schedule: how much was allocated, how much was claimed, how much is unlocked now, and has the holder actually claimed it? Only the last answer changes the liquid balance.
+
+<Concept title="Unlock overhang is future market pressure">
+<p>Locking tokens does not remove dilution risk. 400,000 LAB still counts toward total supply; it is simply unavailable today. When units unlock and are claimed, visible market supply can rise. Read circulating supply and fully diluted allocation together.</p>
+</Concept>
+
+## Time advancement is not an automatic transfer
+
+A timestamp changes the maximum a protocol permits a holder to claim. It does not mean the holder submitted a claim transaction. That explicit action lets an event log answer when units moved from locked to liquid, whether a claim repeated, and whether balances still conserve.
+
+<Think>
+<p>If the phase advances but the community does not claim, should circulating supply increase? No. Claimable amount rises, but liquid balance and circulating supply change only after the claim.</p>
+</Think>
+
+<MechanismDetails>
+
+```text
+unlocked = floor(schedule.total × phaseBps / 10_000)
+claimable = unlocked - schedule.claimed
+claim(holder):
+  balance[holder] += claimable
+  schedule.claimed += claimable
+```
+
+Production contracts must specify block time, rounding direction, revocation, and beneficiary-change rights. This deterministic core uses integer phases so every claim can be replayed and checked.
+
+</MechanismDetails>
+
+<Checkpoint
+  id="token-vesting-states"
+  question="What is true after advancing one vesting phase but before clicking claim?"
+  options={["Both total and circulating supply increase", "Claimable amount increases, but liquid balance and total supply stay unchanged", "Locked tokens are burned and supply falls"]}
+  correctIndex={1}
+  explanation="Advancing time changes a claim ceiling. Before claim, the units remain in the vesting schedule: counted in total supply but not available in a liquid balance."
+/>
+
+## Audit the schedule with one table
+
+- Is the full schedule already counted in total supply?
+- Can `claimed` ever exceed the unlocked ceiling?
+- After claim, does liquid rise and locked fall without total supply changing?
+- Do team, community, and investor unlocks cluster in the same phase?
+
+<SourceList>
+
+- [OpenZeppelin: VestingWallet](https://docs.openzeppelin.com/contracts/5.x/api/finance#VestingWallet)
+- [Ethereum.org: ERC-20 tokens](https://ethereum.org/developers/docs/standards/tokens/erc-20/)
+- [SEC: Crypto asset disclosure risks](https://www.sec.gov/spotlight/cybersecurity-enforcement-actions)
+
+</SourceList>

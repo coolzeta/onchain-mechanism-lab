@@ -1,0 +1,57 @@
+import { LessonLead, Concept, Think, MechanismDetails, Checkpoint, SourceList } from "@/platform/components/LessonPrimitives"
+import { AMMLab } from "@/modules/amm/components/AMMLab"
+
+<LessonLead>
+Being an LP is not the same as putting assets in a savings account. You hand both assets to a pool and receive proportional ownership of future inventory; fees can grow that inventory while trade direction changes the mix you withdraw.
+</LessonLead>
+
+## What does an LP share represent?
+
+Deposit both assets near the current ratio and the system mints LP shares. A share is not a fixed number of TOKEN; it is a percentage of the pool’s total reserves.
+
+<AMMLab locale="en" focus="lp" />
+
+Deposit the suggested ratio, then execute a credit-for-TOKEN swap. Your ownership percentage stays the same, but the inventory represented by that percentage changes.
+
+<Concept title="Fees stay in the pool, so LPs receive a larger common inventory">
+<p>A fee is not paid directly to one LP wallet. It remains in reserves, and every share owns a proportional part of that growth—alongside inventory risk.</p>
+</Concept>
+
+## Keep two ledgers for an LP
+
+The lab compares the value of your current LP position (withdrawable reserves valued at the current spot price) with a hold-only baseline (the original deposit held in a wallet). The gap contains fees, curve effects, and inventory rebalancing. It is not a full accounting statement, but it shows why fee income alone is not enough.
+
+<Think>
+<p>If traders keep buying TOKEN, your LP withdrawal becomes more credit-heavy. If the outside market then values TOKEN higher, who holds more TOKEN: the LP or the holder? That is the entry point for inventory risk.</p>
+</Think>
+
+<MechanismDetails>
+
+```text
+sharesFromX = amountX × totalShares / reserveX
+sharesFromY = amountY × totalShares / reserveY
+shares = min(floor(sharesFromX), floor(sharesFromY))
+
+withdrawX = reserveX × shares / totalShares
+withdrawY = reserveY × shares / totalShares
+```
+
+Real contracts also handle locked initial liquidity, donated assets, rounding, and minimum deposits. Every rounding direction can affect long-run fairness and conservation.
+
+</MechanismDetails>
+
+<Checkpoint
+  id="amm-lp-risk"
+  question="Why is one LP share not a fixed 12,000 credits plus 100 TOKEN?"
+  options={["A share is proportional ownership of pool reserves, and swaps change both reserve amounts", "An LP share is only an ID with no value", "Fees automatically turn every TOKEN into credits"]}
+  correctIndex={0}
+  explanation="LP shares own a percentage of the common inventory. When reserves move, the credits and TOKEN represented by the same share move too."
+/>
+
+<SourceList>
+
+- [Uniswap v2: Fees](https://docs.uniswap.org/contracts/v2/concepts/protocol-overview/fees)
+- [Uniswap v2: Liquidity minting](https://docs.uniswap.org/contracts/v2/concepts/protocol-overview/liquidity-mints)
+- [Uniswap v2: How Uniswap works](https://docs.uniswap.org/contracts/v2/concepts/protocol-overview/how-uniswap-works)
+
+</SourceList>

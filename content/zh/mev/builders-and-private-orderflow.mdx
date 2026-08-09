@@ -1,0 +1,53 @@
+import { LessonLead, Concept, Think, MechanismDetails, Checkpoint, SourceList } from "@/platform/components/LessonPrimitives"
+import { MEVLab } from "@/modules/mev/components/MEVLab"
+
+<LessonLead>
+把交易送进私有订单流，可以减少公开搜索者看见用户意图的机会，但它不会消灭排序权。可见性从公共交易池转移到构建者、提议者和订单流服务之间，新的信任边界也随之出现。
+</LessonLead>
+
+## 公开保护与私有保护不是同一个答案
+
+公开路径的优点是更多人可以观察、竞争和验证；缺点是用户意图暴露给搜索者。私有路径可能让用户更少遭遇公开夹子，但你需要相信服务不会审查、延迟、泄漏或重排交易，也需要知道谁收到了支付。
+
+<MEVLab focus="private" />
+
+切换“普通公开排序”和“私有订单流”，执行同一笔用户交换。注意实验室没有把私有路径标成“绝对安全”：它只减少了一个公开可见性入口，同时把控制点集中到新的参与者之间。
+
+<Concept title="降低可见性，不等于移除排序权">
+<p>私有订单流可以让公开搜索者看不到 pending 意图，但构建者仍可能选择顺序，提议者仍可能接受或拒绝区块，服务方也可能掌握审查和回退权。</p>
+</Concept>
+
+<Think>
+<p>如果一个私有服务保护用户免受夹子，却拒绝某一类交易，你会把它称作“更安全”还是“换了一种信任模型”？先写出你需要审计的三个问题。</p>
+</Think>
+
+<MechanismDetails>
+
+```text
+public:  user → public mempool → many searchers → builder → proposer
+private: user → private relay/builder → proposer
+```
+
+这不是简单的去中心化/中心化二分。要继续问：谁可以加入竞争、谁能查看订单、谁能审查、支付是否可验证、失败后交易能否回到公共路径。
+
+</MechanismDetails>
+
+<Checkpoint
+  id="mev-private-orderflow"
+  question="私有订单流最直接减少了哪一种风险？"
+  options={["它减少公开搜索者看见用户 pending 意图并立即插入排序的机会", "它保证构建者和提议者永远不能审查交易", "它让所有交易都不再需要区块排序"]}
+  correctIndex={0}
+  explanation="私有路径改变的是可见性和提交路径，不是排序本身。它可能降低公开夹子机会，但仍然需要审计服务方、构建者和提议者的权力与审查边界。"
+/>
+
+## 最后留下一个系统问题
+
+MEV 设计不是寻找一个“没有利润的系统”。更好的问题是：利润来自哪一条公开规则，用户能否设置可接受边界，排序者的权力是否可观察，失败与审查是否有可追踪的替代路径。
+
+<SourceList>
+
+- [Flashbots：MEV-Boost 与 proposer-builder separation](https://docs.flashbots.net/flashbots-mev-boost/overview)
+- [Ethereum.org：MEV 与验证者](https://ethereum.org/en/developers/docs/mev/)
+- [Flashbots Protect：私有交易概念](https://docs.flashbots.net/flashbots-protect/overview)
+
+</SourceList>

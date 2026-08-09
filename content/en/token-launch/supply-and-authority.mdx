@@ -1,0 +1,71 @@
+import { LessonLead, Concept, Think, MechanismDetails, Checkpoint, SourceList } from "@/platform/components/LessonPrimitives"
+import { TokenLaunchLab } from "@/modules/token-launch/components/TokenLaunchLab"
+
+<LessonLead>
+A token is not just a number that can grow. It is a public promise about who can change what. Start with a minimal balance table and separate supply, authority, allocation, and time before copying an ERC-20 contract.
+</LessonLead>
+
+## Separate three kinds of supply
+
+This LAB starts with **1,000,000** total units and a **1,200,000** maximum. 600,000 LAB is already liquid in creator, community, and treasury balances; another 400,000 LAB is recorded in vesting schedules.
+
+- **Total supply**: every LAB the state machine recognizes, including locked units.
+- **Liquid supply**: balances that can be transferred, traded, or used now.
+- **Locked supply**: allocated units that need time and a claim action before becoming liquid.
+
+<TokenLaunchLab locale="en" />
+
+<Concept title="Vesting does not make supply disappear">
+<p>Locked tokens still count toward total supply, so they do not erase dilution risk. They change when holders can use the units. A project with low liquid supply may simply have a large future supply date.</p>
+</Concept>
+
+## Maximum supply and mint authority are different gates
+
+The maximum supply answers “how many can ever exist?” Mint authority answers “who can write new units into the balance table?” Even when total supply is unchanged today, a creator who still holds mint authority remains part of the trust model.
+
+<Think>
+<p>If a project says “fixed supply” while a creator key can still call mint, is that a mathematical constraint or a promise that depends on a person? Switch the authority badge to REVOKED and compare the states.</p>
+</Think>
+
+<MechanismDetails>
+
+```text
+mint(to, amount):
+  require(msg.sender == mintAuthority)
+  require(totalSupply + amount <= maxSupply)
+  balance[to] += amount
+  totalSupply += amount
+
+claimVesting(holder):
+  unlocked = schedule.total × phase / 100%
+  amount = unlocked - schedule.claimed
+  balance[holder] += amount
+  schedule.claimed += amount
+```
+
+Production contracts also handle multisig authority, pauses, upgrades, reentrancy, rounding, and governance changes. This lab keeps the code short so every state change stays inspectable.
+
+</MechanismDetails>
+
+<Checkpoint
+  id="token-supply-authority"
+  question="After mint authority is revoked, what happens when vesting advances and a holder claims?"
+  options={["Total supply increases because unlocking is minting", "Total supply stays the same while locked supply falls and liquid balance rises", "All existing tokens are burned"]}
+  correctIndex={1}
+  explanation="Vesting units were already counted in total supply at creation. Claiming moves them from locked state to a liquid balance; only mint expands total supply."
+/>
+
+## Four questions for reading a token
+
+1. What are total supply and maximum supply right now?
+2. Which balances are liquid, and which remain on a vesting schedule?
+3. Who can still call mint, and did revoking authority change that rule?
+4. Which fields change after a transfer, a claim, and a mint?
+
+<SourceList>
+
+- [Ethereum.org: ERC-20 token standard](https://ethereum.org/developers/docs/standards/tokens/erc-20/)
+- [OpenZeppelin: ERC-20 extensions and minting](https://docs.openzeppelin.com/contracts/5.x/erc20)
+- [OpenZeppelin: VestingWallet](https://docs.openzeppelin.com/contracts/5.x/api/finance#VestingWallet)
+
+</SourceList>

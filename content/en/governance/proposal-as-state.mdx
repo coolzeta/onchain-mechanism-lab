@@ -1,0 +1,44 @@
+import { LessonLead, Concept, Think, MechanismDetails, Checkpoint, SourceList } from "@/platform/components/LessonPrimitives"
+import { GovernanceLab } from "@/modules/governance/components/GovernanceLab"
+
+<LessonLead>
+Governance is not a poll that magically edits a protocol. It is a state machine that turns a proposed change into a verifiable, delayed, and eventually executable state transition.
+</LessonLead>
+
+## Turn a sentence into a state transition
+
+“Lower the fee to 0.20%” is a useful intention, but a machine needs a target, an action, and an exact parameter. Without those fields, voters cannot know whether they approved the same change and nodes cannot replay it.
+
+<GovernanceLab focus="core" locale="en" />
+
+After creating the proposal, the fee still reads 0.30%. That is a boundary, not a delay: a vote grants permission to continue; execution writes the new protocol state.
+
+<Concept title="A proposal is a delayed state transition">
+<p>A reviewable proposal answers who proposed it, which target changes, which action is called, which value is supplied, and which balances or parameters move after execution. The title is only a human index.</p>
+</Concept>
+
+<Think><p>If the executor could change the parameter after the vote, what exactly did the community approve?</p></Think>
+
+<MechanismDetails>
+
+```text
+draft → voting(snapshot power) → succeeded / defeated
+      → queued(timelock) → ready → execute(target, action, value)
+```
+
+Production governance usually encodes the target address, selector, and calldata. This lab compresses them into a target, action, and value while preserving the same replayable boundary.
+
+</MechanismDetails>
+
+<Checkpoint
+  id="governance-proposal-state"
+  question="Why does the protocol fee not change immediately after a successful vote?"
+  options={["The vote only lets the proposal continue; a timelock and execution call must write the state", "Votes are never recorded", "All parameters wait for the treasury to be funded"]}
+  correctIndex={0}
+  explanation="Approval and execution are separate permissions. The execution call is the state-changing step."
+/>
+
+<SourceList>
+- [OpenZeppelin Governor](https://docs.openzeppelin.com/contracts/5.x/governance)
+- [Ethereum.org: DAOs](https://ethereum.org/en/dao/)
+</SourceList>

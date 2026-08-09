@@ -1,0 +1,53 @@
+import { LessonLead, Concept, Think, MechanismDetails, Checkpoint, SourceList } from "@/platform/components/LessonPrimitives"
+import { MEVLab } from "@/modules/mev/components/MEVLab"
+
+<LessonLead>
+Sending a transaction through private order flow can reduce the chance that public searchers see user intent, but it does not remove ordering power. Visibility moves to the relationship between the builder, proposer, and order-flow service—and a new trust boundary appears.
+</LessonLead>
+
+## Public protection and private protection are different answers
+
+The public path is observable and competitive, but it exposes intent to searchers. A private path may reduce public sandwiches, but you must trust the service not to censor, delay, leak, or reorder—and understand who receives payment.
+
+<MEVLab focus="private" locale="en" />
+
+Switch between plain public ordering and private flow with the same user swap. The lab does not label private flow “safe”; it removes one public visibility path and concentrates control among different participants.
+
+<Concept title="Less visibility does not mean no ordering power">
+<p>Private flow can hide pending intent from public searchers, while builders still choose order, proposers still accept or reject blocks, and the service can still hold censorship or fallback power.</p>
+</Concept>
+
+<Think>
+<p>If a private service protects users from sandwiches but refuses one class of trade, is it safer—or a different trust model? Write down three questions you would audit.</p>
+</Think>
+
+<MechanismDetails>
+
+```text
+public:  user → public mempool → many searchers → builder → proposer
+private: user → private relay/builder → proposer
+```
+
+This is not a simple decentralized/centralized binary. Ask who can compete, who can see orders, who can censor, whether payment is verifiable, and whether a failed private submission can return to a public path.
+
+</MechanismDetails>
+
+<Checkpoint
+  id="mev-private-orderflow"
+  question="What risk does private order flow most directly reduce?"
+  options={["It reduces public searchers seeing pending intent and immediately inserting an order", "It guarantees builders and proposers can never censor a trade", "It removes the need for block ordering"]}
+  correctIndex={0}
+  explanation="Private flow changes visibility and submission, not ordering itself. It can reduce public sandwich opportunities, but the service, builder, and proposer still need an auditable power boundary."
+/>
+
+## The final systems question
+
+MEV design is not a search for a system with no profit. Ask instead: which public rule creates the profit, can the user set an acceptable boundary, is ordering power observable, and is there a traceable fallback after failure or censorship?
+
+<SourceList>
+
+- [Flashbots: MEV-Boost and proposer-builder separation](https://docs.flashbots.net/flashbots-mev-boost/overview)
+- [Ethereum.org: MEV and validators](https://ethereum.org/en/developers/docs/mev/)
+- [Flashbots Protect: private transactions](https://docs.flashbots.net/flashbots-protect/overview)
+
+</SourceList>

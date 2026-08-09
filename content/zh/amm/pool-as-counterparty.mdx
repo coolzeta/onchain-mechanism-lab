@@ -1,0 +1,97 @@
+import { LessonLead, Concept, Think, MechanismDetails, Checkpoint, SourceList } from "@/platform/components/LessonPrimitives"
+import { AMMLab } from "@/modules/amm/components/AMMLab"
+
+<LessonLead>
+订单簿需要另一个人站在交易的另一边。AMM 把这个问题改写成：如果我们把两种资产放进一个公开资金池，能不能只靠储备比例给出下一笔报价？
+</LessonLead>
+
+## 先忘掉“找对手方”
+
+在订单簿里，你提交 BUY YES，系统要等待某个卖单与它相遇。AMM 没有买一、卖一，也没有一个叫 Alice 的人必须在线。池子自己持有两种储备，任何人都可以按照同一条规则交换。
+
+这里的两种资产叫 **X** 和 **Y**。实验室把它们显示成“积分 / TOKEN”：池子起初有 120,000 积分和 1,000 TOKEN，意味着现货价格约为 120 积分 / TOKEN。
+
+<AMMLab />
+
+## x · y = k 不是价格公式，而是状态约束
+
+恒定乘积池用两种储备的乘积描述当前状态：
+
+```text
+x = 120,000 积分
+y = 1,000 TOKEN
+k = x · y = 120,000,000
+```
+
+当你用积分买 TOKEN，池子收到 X、送出 Y。为了让新的储备仍然满足约束，输出数量不能简单地按交易前的 120 兑换。你买得越多，池子里的 TOKEN 越稀缺，下一份 TOKEN 就越贵。
+
+<Concept title="现货价是池子当前的切线，成交价是你沿曲线走过的平均价格">
+<p>界面上的 120 只是当前储备比例的瞬时读数。一笔有规模的交易会改变储备，所以它从第一份到最后一份面对的价格并不相同，这个差异就是价格冲击的一部分。</p>
+</Concept>
+
+## 手续费为什么会让 k 变大
+
+真实 AMM 通常不会把输入的全部数量用于计算输出。假设手续费是 0.30%，交易者输入 12,000 积分，其中 36 积分留在池子里，只有 11,964 积分参与曲线计算。
+
+这带来两个结果：
+
+1. 交易者得到的 TOKEN 少于没有手续费时的报价；
+2. 手续费留在储备里，长期让 `x · y` 缓慢增长，成为流动性提供者的收入来源。
+
+手续费不是“凭空奖励”。它来自交易者愿意为即时成交支付的成本，最终改变了 LP 持有的两种资产数量。
+
+<Think>
+<p>如果一笔大单把 TOKEN 储备从 1,000 推到 600，下一位交易者看到的价格应该更便宜还是更贵？先看储备比例，再看实验室里的现货价变化。</p>
+</Think>
+
+## LP 提供的不是一笔存款，而是一份库存风险
+
+任何人都可以把两种资产按接近当前比例存入池子，获得 LP 份额。之后交易产生的手续费会留在池子里，LP 可以按份额取回更多资产。
+
+但 LP 并没有锁定一个固定的资产比例。交易者持续买走 TOKEN 时，池子会留下更多积分、减少 TOKEN；如果外部市场价格已经变化，套利者会继续交易，直到池内价格接近外部价格。LP 最后取回的资产组合，可能和最初存入的不一样。
+
+这就是为什么“赚手续费”和“承担无常损失”必须放在同一张账上观察。只看到 APY，而不看库存变化，会漏掉 AMM 最重要的风险。
+
+<MechanismDetails>
+
+```text
+fee = amountIn × 30 / 10,000
+amountAfterFee = amountIn - fee
+amountOut = reserveOut × amountAfterFee
+             --------------------------
+             reserveIn + amountAfterFee
+
+reserveIn  += amountIn
+reserveOut -= amountOut
+```
+
+实现中使用整数资产单位，并在每一步向下取整。生产合约还要处理舍入方向、极端储备、最小输出量和重入等安全问题。
+
+</MechanismDetails>
+
+<Checkpoint
+  id="amm-constant-product"
+  question="为什么一笔大额交换通常会比现货价更差？"
+  options={["因为池子会随机惩罚大户", "因为交易沿着储备曲线改变了池子的比例，后续输出越来越稀缺", "因为 AMM 不收取手续费"]}
+  correctIndex={1}
+  explanation="现货价只描述交易前的瞬时比例；大单会移动储备，必须在曲线上支付越来越高的边际价格。手续费还会进一步减少实际输出。"
+/>
+
+## 把一个 AMM 读成四个问题
+
+走完实验后，你应该能分别回答：
+
+- 池子里现在各有多少 X 和 Y？
+- 当前现货价和这笔交易的平均执行价差多少？
+- 手续费让谁获得了什么，`k` 为什么会增长？
+- 如果你是 LP，价格变化后取回的资产组合发生了什么？
+
+这四个问题比背下 `x·y=k` 更重要。公式只是压缩规则，真正的机制藏在储备、交易者和 LP 之间的资产流动里。
+
+<SourceList>
+
+- [Uniswap v2：价格与恒定乘积](https://docs.uniswap.org/contracts/v2/concepts/protocol-overview/how-uniswap-works)
+- [Uniswap v2：费用与流动性提供者](https://docs.uniswap.org/contracts/v2/concepts/protocol-overview/fees)
+- [Ethereum.org：去中心化交易所](https://ethereum.org/defi/#decentralized-exchanges-dex)
+
+</SourceList>

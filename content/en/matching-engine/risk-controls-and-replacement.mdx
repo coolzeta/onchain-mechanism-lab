@@ -1,0 +1,58 @@
+import { LessonLead, Concept, Think, MechanismDetails, Checkpoint, SourceList } from "@/platform/components/LessonPrimitives"
+import { MatchingEngineLab } from "@/modules/matching-engine/components/MatchingEngineLab"
+
+<LessonLead>
+A matching engine must do more than find a counterparty: it must reject unsafe state transitions. Cancel-replace, self-trade prevention, and frozen-asset rules decide whether a quote becomes a fill, a cancellation, or a risk rejection.
+</LessonLead>
+
+## Changing price is not editing text
+
+Place a bid at 100, then change it to 102. The system should not mutate the old order in place, because a new price must not inherit old time priority. Release the old frozen balance, close the old order, then enqueue a new order with a new sequence.
+
+<MatchingEngineLab locale="en" focus="risk" />
+
+<Concept title="Order lifetime and asset lifetime must agree">
+<p>Assets freeze when an order enters the book; a partial fill settles only the filled part; cancellation releases only the remainder. Cancel-replace must release the old freeze before creating the new one, or the same balance can be locked twice or spent twice.</p>
+</Concept>
+
+## Self-trade creates a false signal
+
+If one account has a buy at 100 and a sell at 99, a naive loop lets the account trade with itself. No real risk transfers, but volume and last price change. The lab cancels the newer order’s remaining quantity, releases its freeze, and records the reason.
+
+<Think>
+<p>Why cancel the new order instead of choosing a random side? Keeping the resting order preserves predictable price-time priority. Venues can choose cancel-new, cancel-old, or cancel-both modes, but the policy must be explicit.</p>
+</Think>
+
+<MechanismDetails>
+
+```text
+replace(old, newPrice, newQuantity):
+  release(old.remaining)
+  close(old)
+  new = enqueue(newPrice, newQuantity, nextSequence)
+  match(new)
+
+if buyer.trader == seller.trader:
+  cancel(new.remaining)
+  emit("SELF_TRADE_PREVENTED")
+```
+
+Risk controls are part of the state machine, not a post-processing decoration. Every rejection, cancellation, and fill should be replayable so an auditor can check balances, freezes, and book state.
+
+</MechanismDetails>
+
+<Checkpoint
+  id="engine-risk-controls"
+  question="Why must a replacement order receive a new time priority?"
+  options={["A changed price is a new queue entry with a new sequence", "The engine never allows any order to change price", "Cancellation restores quantities that already filled"]}
+  correctIndex={0}
+  explanation="Letting a changed order keep its old sequence would allow someone to queue early and repeatedly move to a better price, breaking fair ordering."
+/>
+
+<SourceList>
+
+- [Coinbase Exchange: Self-trade prevention](https://docs.cdp.coinbase.com/exchange/concepts/orders)
+- [CME Group: Understanding order types](https://www.cmegroup.com/education/courses/introduction-to-futures/understanding-order-types.html)
+- [FIX Trading Community: Order states](https://www.fixtrading.org/standards/)
+
+</SourceList>

@@ -1,0 +1,91 @@
+import { LessonLead, Concept, Think, MechanismDetails, Checkpoint, SourceList } from "@/platform/components/LessonPrimitives"
+import { TokenLaunchLab } from "@/modules/token-launch/components/TokenLaunchLab"
+
+<LessonLead>
+一枚代币不是一串会增长的数字，而是一组关于“谁能改变什么”的公开承诺。先别急着复制一份 ERC-20 合约，我们从一张最小余额表开始，看供应、权限、分配和时间如何互相牵制。
+</LessonLead>
+
+## 先区分三种供应
+
+实验室里的 LAB 初始总供应是 **1,000,000**，供应上限是 **1,200,000**。其中 600,000 LAB 已经进入创建者、社区和国库的可用余额，另外 400,000 LAB 写在锁仓计划里。
+
+这三个数字经常被营销文案混在一起：
+
+- **总供应**：状态机已经承认存在的全部 LAB，包括锁仓。
+- **流通供应**：现在可以被转账、交易或使用的余额。
+- **锁仓供应**：已经属于某个计划，但要等时间和领取动作才能进入可用余额。
+
+<TokenLaunchLab />
+
+<Concept title="锁仓不是消失，而是把“拥有”与“可用”拆成两个时间点">
+<p>锁仓代币仍然计入总供应，所以它不会让稀释风险消失。它改变的是进入市场的时间和持有人的可用性。一个看起来流通很少的项目，可能只是把大量供应放在未来日期。</p>
+</Concept>
+
+## 供应上限和增发权限是两道不同的门
+
+供应上限回答“最多可以有多少”，增发权限回答“谁可以把新单位写进余额表”。如果创建者仍有权限，即使当前总供应没有变化，持有人也必须把未来的可能增发纳入信任成本。
+
+在实验室里点击“增发”，你会看到总供应和国库余额同时增加；这不是从某个地址转过来的，而是状态机创建了新单位。点击“撤销增发权限”后，系统会拒绝后续铸造，但已经存在的 LAB 不会被烧掉。
+
+<Think>
+<p>如果一个项目写着“固定供应”，但创建者的密钥仍能调用 mint，你会把这句话理解成数学约束，还是一种需要相信人的承诺？把权限徽章切到 REVOKED，再比较两种状态。</p>
+</Think>
+
+<MechanismDetails>
+
+```text
+mint(to, amount):
+  require(msg.sender == mintAuthority)
+  require(totalSupply + amount <= maxSupply)
+  balance[to] += amount
+  totalSupply += amount
+
+claimVesting(holder):
+  unlocked = schedule.total × phase / 100%
+  amount = unlocked - schedule.claimed
+  balance[holder] += amount
+  schedule.claimed += amount
+```
+
+真实合约还要处理权限多签、暂停、升级、重入、舍入和治理变更。这里故意把代码缩短，先让每一次状态变化都能在界面里被追踪。
+
+</MechanismDetails>
+
+## 分配决定谁先拥有选择权
+
+创建者、社区、国库和学习者的余额不是同一种“利益”。国库可以资助未来的激励，社区锁仓可以把贡献与时间绑定，创建者的集中持仓则可能带来投票权或抛售压力。
+
+把 50,000 LAB 从国库分给学习者，系统只改变持有人之间的分布，总供应保持不变。这和增发不同：前者是所有权转移，后者是供应扩张。两种动作在事件日志里应该永远分开。
+
+## 时间到了，代币也不会自动进入流通
+
+推进时间到下一期后，创建者和社区仍然要分别点击领取。这样可以把“可解锁”与“已经可用”区分开：协议可能允许领取，但持有人还没有执行交易。
+
+解锁会减少锁仓供应、增加流通供应，但不改变总供应；如果同时发生增发，才会看到总供应增长。把这两个动作放在同一个实验里，是理解代币经济学最简单的方式之一。
+
+<Checkpoint
+  id="token-supply-authority"
+  question="撤销增发权限后，推进锁仓并领取代币会发生什么？"
+  options={["总供应增加，因为解锁就是增发", "总供应不变，锁仓减少、流通余额增加", "所有已有代币被销毁"]}
+  correctIndex={1}
+  explanation="锁仓代币从创建时就已经计入总供应。领取只是把它从不可用状态移动到可用余额；只有 mint 才会扩大总供应。"
+/>
+
+## 用四个问题读懂一枚代币
+
+完成实验后，试着用自己的话回答：
+
+1. 当前总供应和供应上限分别是多少？
+2. 哪些余额可用，哪些余额还锁在时间表里？
+3. 谁还可以调用增发，撤销权限是否真的改变了规则？
+4. 一次分配、一次解锁和一次增发，分别改变了哪几个字段？
+
+金融系统的风险通常藏在“看起来只是一个数字”的地方。把数字、权限和时间拆开，你才能继续理解 AMM 的流动性、预测市场的抵押，甚至治理和安全攻击。
+
+<SourceList>
+
+- [Ethereum.org：ERC-20 代币标准](https://ethereum.org/developers/docs/standards/tokens/erc-20/)
+- [OpenZeppelin：ERC-20 扩展与铸造权限](https://docs.openzeppelin.com/contracts/5.x/erc20)
+- [OpenZeppelin：VestingWallet 锁仓参考实现](https://docs.openzeppelin.com/contracts/5.x/api/finance#VestingWallet)
+
+</SourceList>

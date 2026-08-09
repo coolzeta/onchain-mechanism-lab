@@ -1,0 +1,63 @@
+import { LessonLead, Concept, Think, MechanismDetails, Checkpoint, SourceList } from "@/platform/components/LessonPrimitives"
+import { MatchingEngineLab } from "@/modules/matching-engine/components/MatchingEngineLab"
+
+<LessonLead>
+订单簿里的流动性不是一个抽象百分比，而是一组愿意在不同价格等待的资产。买一、卖一、各档数量和最近成交价共同决定：此刻交易需要付出多少，以及一笔更大的订单会把价格推到哪里。
+</LessonLead>
+
+## 价差是第一笔交易成本
+
+买一是当前最高买价，卖一是当前最低卖价。两者之间的价差不是某个人单独收取的费用，而是立即买入再卖出时必须跨过的空间。做市者通过在两边挂单提供选择，承担库存和被动成交的风险，换取可能的价差收益。
+
+<MatchingEngineLab focus="depth" />
+
+<Concept title="流动性要同时看价格和数量">
+<p>一个很窄但只有 1 LAB 的价差，未必比一个稍宽却有 100 LAB 深度的市场更容易交易。价格告诉你第一步在哪里，数量告诉你下一步会不会被迫移动。实验室用卖一深度和深度探针均价把这两件事放在一起。</p>
+</Concept>
+
+## Maker 与 Taker 是两种不同的动作
+
+- Maker 把限价单留在盘口，等待别人来成交；它增加可见深度，也承担订单被选择的风险。
+- Taker 提交能穿过价差的订单，立即消耗已有流动性；它获得确定性，但可能付出价差和价格冲击。
+
+相同的账户可以在不同动作中扮演两种角色。一个“买入”按钮不能说明它是好是坏，必须看它是把订单放进队列，还是跨过卖一执行。
+
+<Think>
+<p>先观察卖一深度，再用市价单扫过 5 LAB。为什么正好吃完同价位的数量时，平均价仍然等于卖一？如果把数量增加到 8，哪一项指标先变化：最近成交价、平均执行价还是订单数量？</p>
+</Think>
+
+<MechanismDetails>
+
+```text
+spread = bestAsk - bestBid
+average = sum(fill.price * fill.quantity) / sum(fill.quantity)
+impact = average / bestAsk - 1
+```
+
+价差、价格冲击和手续费是不同概念：价差来自买卖两边的报价间隔，冲击来自你改变了可用档位，手续费则是协议或平台额外扣除的金额。把它们混在一起，会误判市场到底是“贵”还是“薄”。
+
+</MechanismDetails>
+
+<Checkpoint
+  id="engine-liquidity"
+  question="判断一个订单簿是否有足够流动性时，哪组信息最有用？"
+  options={["只看最近成交价，因为它代表所有未来订单的价格", "只看订单数量，不需要知道这些数量在哪些价格档位", "同时看买卖价差、各档深度和订单扫过后的平均执行价"]}
+  correctIndex={2}
+  explanation="最近成交价是历史结果；价差描述第一步成本，深度描述可承接多少数量，平均执行价则把整笔订单跨档位的真实成本呈现出来。"
+/>
+
+## 继续追问盘口
+
+1. 做市者为什么可能在波动时撤掉报价？
+2. 为什么一个看起来很窄的价差，遇到大单仍然可能很贵？
+3. 当卖一数量下降时，订单簿的风险是价格先变，还是可成交数量先变？
+
+这些问题把订单簿和 AMM 连接起来：订单簿把深度拆成离散报价，AMM 把深度写进一条连续曲线。两者都在回答“下一单位资产要付出什么代价”。
+
+<SourceList>
+
+- [SEC：市场结构与订单类型](https://www.sec.gov/fast-answers/answersordertypeshtm.html)
+- [Nasdaq：Bid-Ask Spread](https://www.nasdaq.com/glossary/b/bid-ask-spread)
+- [Coinbase Exchange：订单簿与撮合](https://docs.cdp.coinbase.com/exchange/concepts/orders)
+
+</SourceList>

@@ -1,0 +1,73 @@
+import { LessonLead, Concept, Think, MechanismDetails, Checkpoint, SourceList } from "@/platform/components/LessonPrimitives"
+import { BeliefOrderLab } from "@/modules/prediction-markets/components/BeliefOrderLab"
+
+<LessonLead>
+“I think it will happen” is not yet market information. A view becomes public only when someone is willing to risk a specific quantity at a specific price.
+</LessonLead>
+
+## Three people, three possible orders
+
+Alice reads the mission plan and thinks YES is close to 75%. She will buy 3 YES shares at no more than 68. Bob thinks delay risk is high and will buy 2 NO shares at 35. Carol has no strong direction and waits for a cheap quote.
+
+Each participant must choose:
+
+1. **Direction**: YES or NO.
+2. **Limit**: the most they will pay per share.
+3. **Quantity**: the most exposure they can tolerate if wrong.
+
+<BeliefOrderLab locale="en" />
+
+## Belief, quote, and trade are different things
+
+If you believe YES has a 70% chance, you do not have to buy at 70. You might require a safety margin and bid 62, or pay 74 to hedge another risk.
+
+The book sees an affordable, executable intention—not the complete probability inside someone's head. Budget, risk tolerance, and existing positions all shape the quote.
+
+<Concept title="A market aggregates executable commitments, not an anonymous poll">
+<p>A survey gives every answer a similar weight. A market price responds to price, quantity, and available collateral. Participants who take more risk can have more influence.</p>
+</Concept>
+
+## BUY NO becomes a sell in the YES book
+
+Our binary market displays one YES book. Buying NO at a maximum of 35 is equivalent to being willing to sell YES at 65:
+
+> `BUY NO @ 35` becomes `SELL YES @ 65`
+
+When a `BUY YES @ 65` meets it, the two sides sum to 100 and the engine can create one fully collateralized contract.
+
+<Think>
+<p>If someone submits `BUY NO @ 27`, at what YES price does it appear? Is it easier or harder to fill?</p>
+</Think>
+
+<MechanismDetails>
+
+```text
+toYesBook(order):
+  if order.outcome == YES:
+    return BID at order.price
+  else:
+    return ASK at 100 - order.price
+```
+
+Unfilled orders reserve `limit * remaining quantity` until cancellation, so the same budget cannot be promised twice.
+
+</MechanismDetails>
+
+<Checkpoint
+  id="belief-order"
+  question="Someone believes YES has a 70% chance but submits BUY YES @ 62. What is the best interpretation?"
+  options={["The system calculated their probability incorrectly", "Belief is not the same as a quote; they will take the risk only with a safety margin", "The true probability of YES must be 62%"]}
+  correctIndex={1}
+  explanation="An order tells us when and how much someone will trade, not their complete private belief."
+/>
+
+## State passed to the next lesson
+
+The book now contains funded willingness to buy YES and NO. Next the matching engine decides who meets first and which price becomes the trade.
+
+<SourceList>
+
+- [Polymarket: prices and order books](https://docs.polymarket.com/market-data/prices-orderbook)
+- [Polymarket: order lifecycle](https://docs.polymarket.com/trading/orders/overview)
+
+</SourceList>

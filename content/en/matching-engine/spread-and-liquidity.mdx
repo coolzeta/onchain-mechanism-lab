@@ -1,0 +1,55 @@
+import { LessonLead, Concept, Think, MechanismDetails, Checkpoint, SourceList } from "@/platform/components/LessonPrimitives"
+import { MatchingEngineLab } from "@/modules/matching-engine/components/MatchingEngineLab"
+
+<LessonLead>
+Order-book liquidity is not an abstract percentage. It is inventory willing to wait at different prices. Best bid, best ask, level sizes, and the last trade together determine what a trade costs now and where a larger order will move the price.
+</LessonLead>
+
+## Spread is the first trading cost
+
+Best bid is the highest current buy price; best ask is the lowest sell price. The spread is not a fee charged by one person—it is the gap an immediate round trip must cross. Makers quote both sides, carrying inventory and adverse-selection risk in exchange for possible spread income.
+
+<MatchingEngineLab locale="en" focus="depth" />
+
+<Concept title="Liquidity needs both price and quantity">
+<p>A one-unit market with a narrow spread may be harder to trade than a slightly wider market with 100 units of depth. Price tells you where the first step is; quantity tells you whether the next step moves. The lab compares best-ask depth with a probe’s average price.</p>
+</Concept>
+
+## Maker and taker are different actions
+
+- A **maker** leaves a limit order and waits. It adds visible depth but can be selected by informed flow.
+- A **taker** crosses the spread and consumes existing liquidity. It gets immediacy but can pay spread and impact.
+
+The same account can perform either action. A “buy” button alone says nothing about cost; ask whether it joins the queue or crosses the ask.
+
+<Think>
+<p>Read best-ask depth, then sweep 5 LAB. Why does the average remain at best ask when you consume exactly that level? At 8 LAB, which metric changes first: last trade, average execution, or quantity?</p>
+</Think>
+
+<MechanismDetails>
+
+```text
+spread = bestAsk - bestBid
+average = sum(fill.price * fill.quantity) / sum(fill.quantity)
+impact = average / bestAsk - 1
+```
+
+Spread, price impact, and fees are separate: spread is the gap between quotes, impact comes from moving through available levels, and fees are an extra protocol or venue charge. Mixing them hides whether a market is expensive or simply thin.
+
+</MechanismDetails>
+
+<Checkpoint
+  id="engine-liquidity"
+  question="Which information best tells you whether an order book has enough liquidity?"
+  options={["Only the last trade, because it represents every future order", "Only total order quantity, without knowing its price levels", "Spread, depth at each level, and average execution after a sweep"]}
+  correctIndex={2}
+  explanation="Last trade is historical. Spread describes first-step cost, depth describes capacity, and average execution reveals the full multi-level cost of the order."
+/>
+
+<SourceList>
+
+- [SEC: Market structure and order types](https://www.sec.gov/fast-answers/answersordertypeshtm.html)
+- [Nasdaq: Bid-ask spread](https://www.nasdaq.com/glossary/b/bid-ask-spread)
+- [Coinbase Exchange: Order book and matching](https://docs.cdp.coinbase.com/exchange/concepts/orders)
+
+</SourceList>

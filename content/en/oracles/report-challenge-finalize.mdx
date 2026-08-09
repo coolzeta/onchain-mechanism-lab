@@ -1,0 +1,92 @@
+import { LessonLead, Concept, Think, MechanismDetails, Checkpoint, SourceList } from "@/platform/components/LessonPrimitives"
+import { OracleLab } from "@/modules/oracles/components/OracleLab"
+
+<LessonLead>
+Smart contracts can verify balances, signatures, and state transitions, but they cannot see a launch, a match, or the weather outside the chain. An oracle is not simply an API call: it is a process for deciding who may report, who may challenge, and what an error costs.
+</LessonLead>
+
+## A source, a report, and a final result are different
+
+The prediction market asks: “Will humans return to the Moon before 2028?” The price can move onchain, but whether the event happened must come from outside. A complete oracle flow has at least three layers:
+
+1. **Data source**: official records, APIs, or evidence that may be delayed, conflicting, or manipulated.
+2. **Initial report**: a participant writes YES or NO and locks a bond.
+3. **Final result**: only after the challenge window and dispute process may a market read the result and pay out.
+
+<OracleLab />
+
+<Concept title="Price reacts to information; it is not the fact itself">
+<p>A market price can show what participants currently believe, but it cannot replace evidence. A wrong report can temporarily become consensus; only an explicit challenge and settlement protocol can correct it.</p>
+</Concept>
+
+## Why a challenge window matters
+
+If a report settled immediately, a delayed or manipulated source would directly trigger payouts. A challenge window gives other participants a public interval to submit the opposite result and lock a bond that proves they are willing to bear the risk.
+
+This lab simplifies the window to two blocks. Advancing time changes the deadline, not the report. Only after the window ends can the protocol finalize the report or enter arbitration. Real systems may use timestamps, dispute rounds, voting, or decentralized evidence, but the question is the same: **when can an error be detected, and why would an honest participant step forward?**
+
+<Think>
+<p>In the “wrong initial report” scenario, report NO, skip the challenge, advance both windows, and finalize. Then reset, report NO again, challenge YES, and compare the stakes and result.</p>
+</Think>
+
+## A bond makes an opinion accountable
+
+The Primary Reporter and Challenger both lock credits. With no challenge, the reporter gets the bond back, even if the result is wrong; with a challenge, the arbitrator reads the evidence, the correct side receives both bonds, and the wrong side absorbs the loss.
+
+This is not magic correctness. It puts attack cost, discovery reward, and time into the state machine. An attacker may still control a source, collude, or make honest challenges too expensive.
+
+<MechanismDetails>
+
+```text
+submit(outcome, bond):
+  lock(reporter, bond)
+  open(challengeWindow)
+
+challenge(oppositeOutcome, bond):
+  lock(challenger, bond)
+
+after window:
+  if no challenge:
+    finalize(reportedOutcome)
+  else:
+    winner = evidence == reportedOutcome ? reporter : challenger
+    winner receives both bonds
+```
+
+Production systems add source aggregation, reputation, commit/reveal, governance, Sybil resistance, and upgrade controls. This lab compresses those concerns into observable bonds and events so the trust boundary stays visible.
+
+</MechanismDetails>
+
+## Why the market cannot repair a bad fact by itself
+
+An order book knows how many credits traders will exchange for a position; it does not know whether the Moon launch or match actually happened. If an oracle writes the wrong result into settlement, a later price rebound cannot automatically reverse payouts.
+
+That is why serious systems separate price discovery from fact reporting. The first handles beliefs and liquidity; the second handles sources, challenges, and disputes. Clear module boundaries make risks easier to test and explain.
+
+<Checkpoint
+  id="oracle-role"
+  question="What is the most important job of an oracle challenge window?"
+  options={["Turn the market price into an objective probability", "Give participants time to submit contrary evidence while staking a bond", "Let the blockchain read the outside world directly"]}
+  correctIndex={1}
+  explanation="A challenge window does not make the chain see reality. It creates public time and economic incentives for disputing a report; the final result still depends on evidence and arbitration rules."
+/>
+
+## Five questions for evaluating an oracle
+
+After the lab, explain:
+
+1. What is the different role of a data source and a reporter?
+2. Why should a report not trigger a payout immediately?
+3. Why must a challenger lock a bond?
+4. Why can a wrong report still finalize when nobody challenges it?
+5. When should a prediction market read the final result?
+
+Oracles are the reality interface for onchain finance: prediction markets, lending collateral ratios, stablecoin reserves, and liquidation prices all depend on them. Understanding their boundary is part of understanding blockchain finance itself.
+
+<SourceList>
+
+- [Chainlink: What is a blockchain oracle?](https://chain.link/education-hub/what-is-a-blockchain-oracle)
+- [UMA: How the Optimistic Oracle works](https://docs.uma.xyz/protocol-overview/how-does-umas-optimistic-oracle-work)
+- [Ethereum.org: Oracles](https://ethereum.org/developers/docs/oracles/)
+
+</SourceList>

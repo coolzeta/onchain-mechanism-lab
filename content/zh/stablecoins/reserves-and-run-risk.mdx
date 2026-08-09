@@ -1,0 +1,59 @@
+import { LessonLead, Concept, Think, MechanismDetails, Checkpoint, SourceList } from "@/platform/components/LessonPrimitives"
+import { StablecoinLab } from "@/modules/stablecoins/components/StablecoinLab"
+
+<LessonLead>
+稳定承诺的最坏时刻不是没有人交易，而是所有人同时想退出。只看供应量会漏掉储备损失、价格滞后和赎回顺序；这一章把它们放在同一张状态账上。
+</LessonLead>
+
+## 储备、供应和退出压力
+
+当系统发行了 500 枚 USD-LAB，协议至少要持续回答：
+
+- 储备按当前价格值多少？
+- 这些稳定币代表多少负债？
+- 如果一批持有人先赎回，剩余储备还覆盖多少供应？
+- 价格输入是当前的，还是已经过时？
+
+<StablecoinLab focus="reserve" />
+
+<Concept title="账面足额不等于任何时刻都能顺利退出">
+<p>抵押率是一个基于价格输入的快照。储备资产可能流动性不足、价格可能下跌、预言机可能滞后，赎回还可能受到手续费、队列或暂停机制影响。安全教育要把这些边界显式化。</p>
+</Concept>
+
+<Think>
+<p>如果储备损失 50%，但流通供应没有变化，界面应该先展示“稳定”还是“抵押不足”？你会把哪一个指标放在最前面？</p>
+</Think>
+
+<MechanismDetails>
+
+```text
+reserveValue = reserve × oraclePrice
+liability    = supply × targetPrice
+coverage     = reserveValue / liability
+
+if coverage < liquidationThreshold:
+  expose the shortfall
+```
+
+稳定币系统通常还需要储备披露、风险参数治理、暂停或清算路径。教学模拟只保留最小状态，但故意让守恒检查和坏状态可见。
+
+</MechanismDetails>
+
+<Checkpoint
+  id="stablecoin-reserve-run"
+  question="为什么“供应还在”不能证明所有人都能按 1 美元退出？"
+  options={["退出依赖可处置储备、正确价格输入和可执行的赎回容量", "因为供应越多，储备就会自动增加", "因为市场价格永远会替协议补足储备"]}
+  correctIndex={0}
+  explanation="供应是负债记录，不是储备资产。储备损失、价格错误和流动性约束都可能让退出承诺变得不完整。"
+/>
+
+## 本章小结：稳定不是一个数字
+
+一个可信的稳定币系统至少要同时说明目标、抵押、发行上限、赎回规则、储备状态、价格输入和失败时谁承担损失。把其中任意一项藏起来，用户就会把标签误认为机制。
+
+<SourceList>
+
+- [BIS：稳定币安排与储备风险](https://www.bis.org/cpmi/publ/d206.htm)
+- [Circle：储备透明度](https://www.circle.com/en/transparency)
+
+</SourceList>

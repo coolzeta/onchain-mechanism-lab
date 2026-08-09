@@ -1,0 +1,52 @@
+import { LessonLead, Concept, Think, MechanismDetails, Checkpoint, SourceList } from "@/platform/components/LessonPrimitives"
+import { OracleLab } from "@/modules/oracles/components/OracleLab"
+
+<LessonLead>
+The first oracle boundary is not the smart contract. It is the quality of the evidence outside the chain. An API response, a reporter's signed claim, and the result written onchain sit in different trust layers.
+</LessonLead>
+
+## A data source is not the final fact
+
+The lab offers three sources: multiple official records agree, an unverified source conflicts, and a delayed source is ambiguous. Switch between them and reveal the teaching record. Source status changes risk, but it does not automatically make the protocol report an outcome.
+
+<OracleLab focus="sources" />
+
+<Concept title="Multiple sources reduce risk without removing definition questions">
+<p>Even if several sources say YES, the protocol still needs a timestamp, a priority rule for conflicts, and a policy for missing data: pause, wait, or use a fallback.</p>
+</Concept>
+
+## A reporter turns evidence into an accountable claim
+
+A reporter is not reality. It is a participant willing to lock a bond and stand behind an outcome. The report can be observed, challenged, and finalized, so source, report, and final result should remain separate states.
+
+<Think>
+<p>If an attacker controls a price API, copying it does not mean the reporter knows reality. Would you add more sources, delay settlement, or increase the cost of a wrong report?</p>
+</Think>
+
+<MechanismDetails>
+
+```text
+source = collect_external_evidence()
+report = reporter.sign(outcome, bond)
+open_challenge_window(report)
+```
+
+The lab compresses data aggregation into three observable sources while keeping the engineering boundary visible: evidence quality, reporter responsibility, and settlement permission are not one API call.
+
+</MechanismDetails>
+
+<Checkpoint
+  id="oracle-source-quality"
+  question="Why should a single API response not become the final result directly?"
+  options={["An API can never return YES or NO", "A source can be delayed, conflicting, or manipulated, so the protocol needs responsibility and dispute rules", "Blockchains cannot store strings"]}
+  correctIndex={1}
+  explanation="A source is an outside input. Reporter responsibility, a challenge window, and finalization determine when downstream systems may depend on it."
+/>
+
+<SourceList>
+
+- [UMA: Optimistic Oracle](https://docs.uma.xyz/protocol-overview/how-does-umas-oracle-work)
+- [Chainlink: Data Feeds](https://docs.chain.link/data-feeds)
+- [Ethereum.org: Oracles](https://ethereum.org/developers/docs/oracles/)
+
+</SourceList>

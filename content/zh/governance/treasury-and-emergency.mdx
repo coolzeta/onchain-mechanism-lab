@@ -1,0 +1,54 @@
+import { LessonLead, Concept, Think, MechanismDetails, Checkpoint, SourceList } from "@/platform/components/LessonPrimitives"
+import { GovernanceLab } from "@/modules/governance/components/GovernanceLab"
+
+<LessonLead>
+治理最终要面对资产：金库里的积分、协议参数和暂停开关。低法定人数可以让决定更快，但也会让较少的参与者控制更大的价值；紧急取消则把安全响应变成另一条权限边界。
+</LessonLead>
+
+## 把金库拨款放回同一张账
+
+一笔 180,000 积分的拨款只有在执行后才从金库移动到 Alice。之前的投票、排队和等待都没有凭空创造余额。切换到低法定人数场景，就能看到“参与不足”如何成为治理风险，而不是效率指标。
+
+<GovernanceLab focus="treasury" />
+
+用正常金库场景完成拨款，再重置到“低法定人数”和“时间锁取消”。请同时看金库余额、接收者余额与事件日志，而不是只看提案状态。
+
+<Concept title="安全参数是相互牵制的一组旋钮">
+<p>法定人数影响谁能让提案继续，多数规则影响支持与反对的关系，时间锁影响反应窗口，取消者影响紧急止损。提高一个参数不一定让系统整体更安全，关键在于它们如何组合。</p>
+</Concept>
+
+<Think>
+<p>如果把 quorum 调得很低，协议会更“敏捷”；但在成员不在线、代币集中或攻击者借票时，谁承担这份敏捷的成本？</p>
+</Think>
+
+<MechanismDetails>
+
+```text
+treasury_before + member_credits_before
+  = treasury_after + member_credits_after
+
+cancel(queued | ready) → no transfer, proposal becomes cancelled
+```
+
+紧急取消不会抹掉已经发生的投票，也不会替执行者修改历史；它只是在资产移动前阻断调用。生产系统还要设计 guardian 轮换、取消权限过期和金库支出上限。
+
+</MechanismDetails>
+
+<Checkpoint
+  id="governance-treasury"
+  question="预言机负责把外部事实带进系统；治理在这里负责什么？"
+  options={["治理决定哪些经过投票和时间锁的参数或资产动作可以被执行", "治理会自动判断现实中的事件真假", "治理只负责显示一个社区情绪百分比"]}
+  correctIndex={0}
+  explanation="治理不是预言机。它负责授权协议状态改变；金库转账、参数更新和暂停动作都必须经过明确的权限链。"
+/>
+
+## 结课复盘
+
+把四个问题连起来：提案定义改变什么，快照定义谁能表达，时间锁定义何时可以改变，金库与取消者定义风险在哪里落地。下一步，无论你研究 AMM、借贷还是稳定币，都可以用同样的“谁能改变状态”问题开始审计。
+
+<SourceList>
+
+- [Safe：多签金库基础](https://help.safe.global/en/articles/40827-what-is-a-safe)
+- [OpenZeppelin：治理安全建议](https://docs.openzeppelin.com/contracts/5.x/governance)
+
+</SourceList>

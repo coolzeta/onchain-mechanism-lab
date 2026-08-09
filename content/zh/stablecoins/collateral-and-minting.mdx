@@ -1,0 +1,59 @@
+import { LessonLead, Concept, Think, MechanismDetails, Checkpoint, SourceList } from "@/platform/components/LessonPrimitives"
+import { StablecoinLab } from "@/modules/stablecoins/components/StablecoinLab"
+
+<LessonLead>
+发行稳定币不是把抵押品的全部价格借出来。协议要先问：如果抵押品下跌、价格更新有延迟，储备还剩多少空间？最低抵押率就是把这个问题写成一条可执行的上限。
+</LessonLead>
+
+## 100 美元为什么只能发行约 66 枚
+
+假设每枚 USD-LAB 目标是 1 美元，最低抵押率设为 150%。如果你存入价值 100 美元的抵押品，最大发行量约为：
+
+```text
+maxMint = collateralValue / targetPrice / 150%
+        = 100 / 1 / 1.5
+        ≈ 66 USD-LAB
+```
+
+剩下的 50 美元不是“闲置资金”，而是吸收价格冲击、清算折价和交易摩擦的缓冲。
+
+<StablecoinLab focus="collateral" />
+
+<Concept title="抵押率同时描述资本效率和安全缓冲">
+<p>抵押率越接近 100%，资本效率越高，但价格稍微下跌就可能不足以覆盖稳定币负债。抵押率越高，系统更能吸收波动，却要求发行者锁定更多资产。</p>
+</Concept>
+
+<Think>
+<p>如果抵押品价格从 1.00 美元跌到 0.70 美元，150% 的最低抵押率还剩多少缓冲？不要只看发行量，先计算储备价值和负债价值。</p>
+</Think>
+
+<MechanismDetails>
+
+```text
+liabilityValue = supply × targetPrice
+collateralRatio = reserveValue / liabilityValue
+require collateralRatio >= minimumRatio
+```
+
+协议在发行时检查上限，但发行之后还要持续读取抵押品价格。能发行不代表永远安全；状态会随着价格和债务变化。
+
+</MechanismDetails>
+
+<Checkpoint
+  id="stablecoin-collateral-ratio"
+  question="价值 100 美元、最低抵押率 150% 时，理论上最多发行多少枚 1 美元稳定币？"
+  options={["约 66 枚，因为发行量必须低于抵押价值并留下 50% 缓冲", "100 枚，因为抵押品价值就是 100 美元", "150 枚，因为抵押率越高可以发行越多"]}
+  correctIndex={0}
+  explanation="最低抵押率 150% 意味着每 1 美元负债需要 1.5 美元抵押品，因此 100 美元抵押品最多支持约 66 美元负债。"
+/>
+
+## 本章小结
+
+你已经看到发行上限不是一个孤立参数，而是抵押品价格、目标价格和风险缓冲的交点。下一章让市场价格脱锚，观察赎回和套利到底能修复什么。
+
+<SourceList>
+
+- [MakerDAO：Liquidation 2.0 与抵押风险](https://docs.makerdao.com/smart-contract-modules/dog-and-clipper-detailed-documentation)
+- [Aave：健康度与抵押风险](https://aave.com/help/borrowing/health-factor)
+
+</SourceList>

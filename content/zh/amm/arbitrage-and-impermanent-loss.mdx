@@ -1,0 +1,69 @@
+import { LessonLead, Concept, Think, MechanismDetails, Checkpoint, SourceList } from "@/platform/components/LessonPrimitives"
+import { AMMLab } from "@/modules/amm/components/AMMLab"
+
+<LessonLead>
+AMM 只知道自己的储备比例，不知道外面的市场价格。当两者不一致时，套利者会用自己的资产和手续费成本把池内价格推回去；LP 承担的库存变化，也正是在这条路径上发生的。
+</LessonLead>
+
+## 先制造一个价格差
+
+把外部价格调到 150 积分 / TOKEN。池子还停留在 120 左右，于是 TOKEN 在池内相对便宜。实验室中的套利者会用积分买 TOKEN，把积分放进池子、把 TOKEN 带走，直到池内价格靠近外部价格。
+
+<AMMLab focus="arbitrage" />
+
+注意：套利者没有凭空创造价值。他支付了交易费，也承担了价格冲击；他的利润来自池内外价格差，池子则获得了重新排列后的储备和手续费。
+
+<Concept title="套利不是预言，是把两个市场的报价拉到同一条线上">
+<p>只要交易成本没有吃掉价差，套利者就有动机交易。套利完成后，池内价格更接近外部价格，但 LP 手里的 TOKEN / 积分比例已经改变。</p>
+</Concept>
+
+## 无常损失为什么要和退出时一起看
+
+实验室把 LP 的当前持仓价值和“如果一直放在钱包里”的持有基准放在一起。价格变化过程中，这两个数字会分开；只有当你退出并把资产拿回钱包时，这个差异才变成已实现的结果。
+
+这不是说 LP 一定亏损。手续费可能抵消甚至超过库存差异；“无常”也不意味着风险不存在，而是强调它依赖价格是否回到原来的关系，以及你何时退出。
+
+<Think>
+<p>如果 TOKEN 的外部价格从 120 升到 150，套利者会从池子拿走更多 TOKEN 还是把 TOKEN 卖回池子？这一步先判断池内 TOKEN 是便宜还是昂贵，再决定交易方向。</p>
+</Think>
+
+## 把套利压缩成一个可验证状态转换
+
+<MechanismDetails>
+
+```text
+if poolPrice < externalPrice:
+  arbitrageur swaps X for Y
+else:
+  arbitrageur swaps Y for X
+
+repeat until price gap <= tolerance
+fees stay in reserves
+LP position = reserves × (LP shares / total shares)
+```
+
+现实协议还需要预言机或外部市场作为参考、保护最小输出、处理 MEV 竞争，并防止套利交易把池子推到极端储备。这里先把价格差、手续费和库存变化放在同一条事件日志中。
+
+</MechanismDetails>
+
+<Checkpoint
+  id="amm-arbitrage"
+  question="当池内 TOKEN 价格低于外部市场时，套利者通常会做什么？"
+  options={["用积分从池子买走 TOKEN，让池内 TOKEN 变得更稀缺", "把 TOKEN 卖回池子，让池内 TOKEN 更多", "什么也不做，因为 AMM 会自动读取外部价格"]}
+  correctIndex={0}
+  explanation="套利者买入池内相对便宜的 TOKEN。交易会增加积分储备、减少 TOKEN 储备，把池内价格推向外部价格；AMM 本身不会自动读取窗外价格。"
+/>
+
+## 从一个池子推导系统风险
+
+一个成熟的 AMM 设计，至少要同时回答：外部价格从哪里来、谁承担价格差被交易的成本、LP 如何理解库存变化、交易者如何限制最坏成交，以及暂停或升级权限由谁控制。
+
+如果你只记住 `x · y = k`，你只记住了曲线；如果你能沿着套利事件追踪资产、激励和风险，才真正读懂了做市机制。
+
+<SourceList>
+
+- [Uniswap v2：套利与价格](https://docs.uniswap.org/contracts/v2/concepts/protocol-overview/how-uniswap-works)
+- [Uniswap v2：流动性提供者费用](https://docs.uniswap.org/contracts/v2/concepts/protocol-overview/fees)
+- [Paradigm：无常损失](https://www.paradigm.xyz/2021/04/understanding-automated-market-makers-part-1)
+
+</SourceList>

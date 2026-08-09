@@ -1,0 +1,67 @@
+import { LessonLead, Concept, Think, MechanismDetails, Checkpoint, SourceList } from "@/platform/components/LessonPrimitives"
+import { LendingLab } from "@/modules/lending/components/LendingLab"
+
+<LessonLead>
+借贷协议不会直接读取所有市场的每一笔成交。它依赖预言机把一个可验证的价格写入风控模块。市场已经下跌，不代表协议已经知道；协议读取了错误价格，也不代表清算线真的安全。
+</LessonLead>
+
+## 把两个价格放在一起
+
+本实验同时显示：
+
+- **市场价格**：外部交易者此刻愿意成交的价格；
+- **预言机价格**：协议当前用于计算抵押价值、借款额度和清算线的价格。
+
+当市场价格跌到 72、预言机还停留在 120 时，界面上的健康度可能仍然很高。只有预言机更新，协议才会重新计算风险。
+
+<LendingLab focus="oracle" />
+
+<Concept title="预言机不是显示层，它是清算状态机的输入">
+<p>价格输入每改变一次，借款额度、健康度和可清算状态都可能改变。预言机的延迟、来源质量和更新阈值会直接决定系统允许多少风险留在链上。</p>
+</Concept>
+
+## 抵押品耗尽后的债务叫坏账
+
+如果价格跳得太快，或者抵押品本来就不足，清算人偿还了能覆盖的部分债务后，仍可能剩下一笔没有对应资产的负债。这不是普通的未结算订单，而是协议需要吸收的缺口。
+
+常见的缓冲包括更低的 LTV、保险基金、储备金、清算奖励和更可靠的价格来源。它们不能保证永远没有坏账，但可以改变坏账出现的概率和由谁承担。
+
+<Think>
+<p>一个协议的预言机价格比真实市场高很多，借款人因此多借了钱。后来价格突然修正，最先受伤的会是借款人、清算人，还是协议的储备？请按资产流向回答。</p>
+</Think>
+
+<MechanismDetails>
+
+```text
+marketPrice != oraclePrice
+
+healthFactor = value(oraclePrice) * threshold / debt
+if marketPrice moves first:
+  risk is invisible until oracle updates
+
+if all collateral is seized and debt > 0:
+  badDebt = debt
+```
+
+“链上”只保证协议按它读到的输入一致执行；它不能自动证明输入就是现实世界的正确价格。
+
+</MechanismDetails>
+
+<Checkpoint
+  id="lending-oracle-bad-debt"
+  question="市场价格已经下跌，但预言机仍返回旧价格时，最准确的描述是什么？"
+  options={["协议已经自动清算，只是界面没有刷新", "协议会按旧价格计算，风险可能暂时被低估；更新后才会暴露真实边界", "市场价格和预言机价格永远必须相同"]}
+  correctIndex={1}
+  explanation="风控模块只能使用它已经读取的价格。滞后或错误输入会延迟清算，严重时导致抵押品不足和坏账。"
+/>
+
+## 你已经走完一笔借贷的风险生命周期
+
+从抵押和 LTV，到利息和健康度，再到清算、预言机和坏账，借贷协议把“未来可能还不上”转换成一组持续可检查的状态。分析任何借贷系统时，先问：价格由谁提供、债务如何增长、清算由谁执行、缺口由谁承担？
+
+<SourceList>
+
+- [Aave：风险参数与清算](https://aave.com/help/borrowing/health-factor)
+- [Chainlink：DeFi 预言机](https://docs.chain.link/data-feeds)
+
+</SourceList>

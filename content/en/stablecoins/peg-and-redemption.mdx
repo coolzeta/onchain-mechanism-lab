@@ -1,0 +1,60 @@
+import { LessonLead, Concept, Think, MechanismDetails, Checkpoint, SourceList } from "@/platform/components/LessonPrimitives"
+import { StablecoinLab } from "@/modules/stablecoins/components/StablecoinLab"
+
+<LessonLead>
+“A stablecoin is worth one dollar” is not a fact guaranteed by its name. It is a path that participants can inspect: someone can issue under a rule, and someone else believes they can exit under the same rule. Put that path on the lab bench first.
+</LessonLead>
+
+## Separate three prices
+
+This lab uses virtual USD-LAB as the stablecoin and `COLLATERAL` as the reserve asset. It shows three prices at once:
+
+- **Target price**: the 1.00 USD value the protocol wants USD-LAB to represent;
+- **Market price**: the price participants are willing to trade externally;
+- **Oracle price**: the input the protocol uses to value its reserves.
+
+They may start equal, but that does not make them the same forever. The target becomes more than a slogan only when issuance, reserves, and redemption rules can actually execute.
+
+<StablecoinLab locale="en" focus="peg" />
+
+<Concept title="Redemption is the stablecoin's exit">
+<p>If a holder cannot exchange a stablecoin for close to one dollar of reserve value, a market discount has no clear arbitrage path. Redemption does not promise a market that never moves; it gives the market a verifiable reference for moving back toward the target.</p>
+</Concept>
+
+<Think>
+<p>If the market price falls to $0.94 but the protocol has no redemption path, who would buy it back toward $1? Write down the three conditions you think must exist first.</p>
+</Think>
+
+<MechanismDetails>
+
+```text
+targetPrice = 1.00 USD
+redeem(amount):
+  require holderBalance >= amount
+  burn(amount)
+  collateralOut = amount × targetPrice / oraclePrice - fee
+  reserve -= collateralOut
+```
+
+The `burn` matters: redemption does not copy a token to the next holder; it reduces supply and releases an asset from reserves. Real protocols also handle minimum units, fees, liquidity, and pause controls.
+
+</MechanismDetails>
+
+<Checkpoint
+  id="stablecoin-peg-redemption"
+  question="Why can't a token named USD be guaranteed to trade at one dollar by itself?"
+  options={["A name is interface text; stability needs reserves, rules, and an executable redemption path", "Every stablecoin should automatically rewrite its market price", "A market price can never move away from the target"]}
+  correctIndex={0}
+  explanation="A peg comes from issuance, reserve, and exit mechanisms that participants can inspect and execute—not from a label or display value."
+/>
+
+## The state you carry forward
+
+You have separated “one dollar” into a target, a market price, and an exit. Next, ask how much safety buffer collateral must leave before the protocol can issue more USD-LAB.
+
+<SourceList>
+
+- [MakerDAO: DAI collateral and stability](https://makerdao.com/whitepaper/)
+- [Circle: USDC reserves and redemption](https://www.circle.com/en/transparency)
+
+</SourceList>

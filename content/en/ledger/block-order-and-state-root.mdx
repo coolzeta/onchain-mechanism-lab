@@ -1,0 +1,58 @@
+import { LessonLead, Concept, Think, MechanismDetails, Checkpoint, SourceList } from "@/platform/components/LessonPrimitives"
+import { LedgerLab } from "@/modules/ledger/components/LedgerLab"
+
+<LessonLead>
+The important question is not who wrote to a database first. It is whether every node can derive the same output from the same input. Put transactions into consecutive blocks, replay them from genesis, and watch order, hashes, and state roots constrain one another.
+</LessonLead>
+
+## Order is part of state
+
+Alice paying you before you pay Bob is not always equivalent to the reverse. Nonces, balances, collateral, and liquidation boundaries can change after every step. A block therefore commits to transaction order, not merely to a set of transactions.
+
+<LedgerLab focus="replay" />
+
+Mine a block, then verify the chain. The lab starts from three accounts with 1,000 points each, replays every transaction in block order, and recomputes balances, nonces, and the state root.
+
+<Concept title="A hash is a verifiable commitment, not consensus itself">
+<p>The block hash references the parent hash, transaction fingerprints, and the state root after execution. A modified field is detectable when another node replays the chain.</p>
+</Concept>
+
+## A state root compresses the execution result
+
+A state root is not a list of every account in the block header. It is a deterministic digest of that state. Two nodes receiving the same prior state and order should derive the same root; otherwise they need to investigate the rule, input, or client implementation.
+
+<Think>
+<p>If two nodes see the same transactions but one executes the second first, why can their nonces or balances differ? State transitions are not unordered set operations: every result becomes the next input.</p>
+</Think>
+
+<MechanismDetails>
+
+```text
+replay(chain):
+  state = genesis
+  for block in chain:
+    require block.previousHash == previous.hash
+    for tx in block.transactionIds:
+      apply_or_reject(state, tx)
+    require block.stateRoot == hash(state)
+```
+
+The lab compresses the complexity of a Merkle Patricia Trie into a deterministic account digest, while preserving the engineering habit that execution and verification share pure rules and can be replayed.
+
+</MechanismDetails>
+
+<Checkpoint
+  id="state-root-replay"
+  question="What is the most important use of a state root?"
+  options={["Making a wallet interface prettier", "Committing to the global state after execution so nodes can detect divergence", "Giving pending transactions an automatic balance"]}
+  correctIndex={1}
+  explanation="A state root is a deterministic digest of the execution result. Different roots for the same input reveal a state divergence or modified data."
+/>
+
+<SourceList>
+
+- [Ethereum.org: Blocks](https://ethereum.org/developers/docs/blocks/)
+- [Ethereum.org: State](https://ethereum.org/developers/docs/intro-to-ethereum/#state)
+- [Ethereum Yellow Paper: Blocks and state](https://ethereum.github.io/yellowpaper/paper.pdf)
+
+</SourceList>

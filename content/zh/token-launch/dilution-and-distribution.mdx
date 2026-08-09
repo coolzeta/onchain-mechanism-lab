@@ -1,0 +1,73 @@
+import { LessonLead, Concept, Think, MechanismDetails, Checkpoint, SourceList } from "@/platform/components/LessonPrimitives"
+import { TokenLaunchLab } from "@/modules/token-launch/components/TokenLaunchLab"
+
+<LessonLead>
+代币经济的核心问题不是“有多少枚”，而是每一个动作之后，谁的比例变大、谁的比例变小，以及这种变化是否来自所有权转移、供应扩张或供应销毁。
+</LessonLead>
+
+## 三种动作，三种账本结果
+
+<TokenLaunchLab focus="distribution" />
+
+- **转账**：总供应不变，只改变持有人之间的分布。
+- **增发**：余额和总供应一起增加，既有持有人的比例可能被稀释。
+- **销毁**：持有人余额和总供应一起减少，剩余单位的相对比例可能上升。
+
+这三种动作在界面上都可能表现为“某个数字变了”，但它们对其他持有人的风险完全不同。
+
+<Concept title="集中度要同时看流通余额和锁仓分配">
+<p>创建者可能只有 10% 的流通余额，却拥有 40% 的总分配（包括锁仓）。前一个数字影响当前市场可交易供给，后一个数字影响未来投票权、解锁压力和潜在抛售。实验室同时显示流通占比与最大分配占比。</p>
+</Concept>
+
+## 稀释不是价格下跌的同义词
+
+如果国库把 50,000 LAB 转给学习者，持有人的总供应比例不因为转账而改变；如果创建者增发 50,000 LAB，原有单位在总供应中的份额下降，即使市场价格还没有变化，也已经发生了稀释。
+
+销毁则相反：它减少总供应，但不自动让每个持有人获得资产。谁销毁、销毁的是流通余额还是锁仓余额，都会改变结果。教学内核只允许从可用余额销毁，避免把“承诺中的代币”当成已经存在的可消费余额。
+
+<Think>
+<p>先做一次国库分配，再销毁社区余额。为什么学习者的数量增加并不代表总供应增加？为什么社区销毁后，创建者的比例可能上升，即使创建者一枚都没有收到？</p>
+</Think>
+
+<MechanismDetails>
+
+```text
+transfer(from, to, amount):
+  balance[from] -= amount
+  balance[to] += amount
+
+mint(to, amount):
+  balance[to] += amount
+  totalSupply += amount
+
+burn(from, amount):
+  balance[from] -= amount
+  totalSupply -= amount
+```
+
+实际项目还需要公开初始分配、团队锁仓、做市库存、国库支出和销毁权限。没有这些上下文，“总供应”这一项本身无法告诉你权力在哪里。
+
+</MechanismDetails>
+
+<Checkpoint
+  id="token-dilution-distribution"
+  question="哪一种操作会直接改变总供应？"
+  options={["国库把 50,000 LAB 转给学习者", "创建者增发 50,000 LAB，或社区销毁 25,000 LAB", "学习者领取已经计入总供应的锁仓"]}
+  correctIndex={1}
+  explanation="转账和领取只重新分配已经存在的单位；增发增加总供应，销毁减少总供应。两者都会改变其他持有人的相对比例。"
+/>
+
+## 读一张分配表
+
+1. 最大持有者是按流通余额，还是按包含锁仓的分配计算？
+2. 国库转账是预算支出，不是增发吗？
+3. 未来解锁的供应是否会让当前流通比例看起来过于乐观？
+4. 销毁权限是否集中在一个账户？
+
+<SourceList>
+
+- [Uniswap：代币分配与治理讨论](https://gov.uniswap.org/)
+- [OpenZeppelin：ERC-20 Burnable](https://docs.openzeppelin.com/contracts/5.x/api/token/erc20#ERC20Burnable)
+- [Ethereum.org：ERC-20 代币标准](https://ethereum.org/developers/docs/standards/tokens/erc-20/)
+
+</SourceList>

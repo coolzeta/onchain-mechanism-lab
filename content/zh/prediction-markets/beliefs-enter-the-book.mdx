@@ -1,0 +1,73 @@
+import { LessonLead, Concept, Think, MechanismDetails, Checkpoint, SourceList } from "@/platform/components/LessonPrimitives"
+import { BeliefOrderLab } from "@/modules/prediction-markets/components/BeliefOrderLab"
+
+<LessonLead>
+“我觉得会发生”还不是市场信息。只有当一个人愿意在某个价格承担一定数量的损失时，观点才会变成订单，进入其他人可以接受或拒绝的公共报价集合。
+</LessonLead>
+
+## 三个人可以有三种完全不同的订单
+
+Alice 阅读了任务计划，认为 YES 的可能性接近 75%。她愿意以不超过 68 的价格购买 3 份 YES。Bob 认为延期风险很大，愿意用 35 购买 2 份 NO。Carol 没有强烈方向，只想在价格足够便宜时买入。
+
+他们需要分别回答三个问题：
+
+1. **方向**：愿意持有 YES 还是 NO？
+2. **限价**：每份最多支付多少积分？
+3. **数量**：判断错误时，最多愿意损失多少？
+
+<BeliefOrderLab />
+
+## 信念、报价和成交价是三件事
+
+如果你认为 YES 有 70% 可能发生，不代表你应该无条件支付 70。你可能希望留出安全边际，只在 64 以下买入；也可能因为特别需要对冲某种风险，愿意支付 74。
+
+因此市场看到的不是参与者脑中的完整概率，而是他们在预算、风险偏好和现有持仓约束下提交的报价。
+
+<Concept title="市场聚合的是可执行意愿，不是匿名问卷">
+<p>一项调查里，每个人的回答权重相同；市场里，价格受到订单价格、数量和可用资金共同影响。承担更多风险的人会产生更大的影响。</p>
+</Concept>
+
+## 买 NO 可以转换成 YES 订单簿中的卖单
+
+我们的二元市场只展示一张 YES 订单簿。买一份 NO、最高支付 35，与愿意在 YES 价格 65 时站在 NO 一边是同一件事。因此模拟器会把：
+
+> `BUY NO @ 35` 转换为 `SELL YES @ 65`
+
+当一张 `BUY YES @ 65` 与它相遇，两人支付的金额恰好是 65 + 35 = 100，结算合约便能为他们创建一份完整的二元合约。
+
+<Think>
+<p>如果有人提交 BUY NO @ 27，它会出现在 YES 订单簿的哪个价格？这张订单更容易还是更难成交？</p>
+</Think>
+
+<MechanismDetails>
+
+```text
+toYesBook(order):
+  if order.outcome == YES:
+    return BID at order.price
+  else:
+    return ASK at 100 - order.price
+```
+
+未成交订单需要冻结 `限价 × 剩余数量`，撤单后才释放，避免同一笔预算被重复承诺。
+
+</MechanismDetails>
+
+<Checkpoint
+  id="belief-order"
+  question="某人相信 YES 概率为 70%，但只提交 BUY YES @ 62。最合理的解释是什么？"
+  options={["系统把他的概率算错了", "信念不等于报价，他只愿意在有安全边际时承担风险", "YES 的真实概率只能是 62%"]}
+  correctIndex={1}
+  explanation="订单只告诉我们他在什么价格和数量下愿意交易，不能完整还原他的主观信念。"
+/>
+
+## 本章小结
+
+订单簿里已经出现买 YES 和买 NO 的意愿，但它们还没有自动成为交易。下一章会进入撮合引擎，观察谁先成交、以什么价格成交。
+
+<SourceList>
+
+- [Polymarket：价格与订单簿](https://docs.polymarket.com/market-data/prices-orderbook)
+- [Polymarket：订单生命周期](https://docs.polymarket.com/trading/orders/overview)
+
+</SourceList>

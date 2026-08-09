@@ -1,0 +1,61 @@
+import { LessonLead, Concept, Think, MechanismDetails, Checkpoint, SourceList } from "@/platform/components/LessonPrimitives"
+import { TokenLaunchLab } from "@/modules/token-launch/components/TokenLaunchLab"
+
+<LessonLead>
+“供应上限固定”只回答数学上的最大值；它没有回答谁能修改余额、谁能改变参数、谁能批准下一次增发。权限移交和撤销，才是代币发行器真正的控制面。
+</LessonLead>
+
+## 从单签走向多签
+
+<TokenLaunchLab focus="governance" />
+
+实验室先把增发权限交给创建者单签。移交给 2/3 多签后，创建者自己的 mint 请求会失败，只有带有 `actor: multisig` 的模拟执行才会通过。再撤销权限，供应只能来自已有余额、锁仓领取或转账，之后不能重新恢复。
+
+<Concept title="多签降低单点风险，但不自动保证决策正确">
+<p>多签把“一个密钥能否改变供应”变成“至少多少个批准者共同执行”。它降低了单点丢失或被盗的风险，却引入签名者选择、阈值、提案内容和社会协调等新的信任边界。</p>
+</Concept>
+
+## 权限状态也是公开状态
+
+一个审计者应该能从状态和事件回答：当前批准者是谁？权限何时移交？移交前后的 mint 是否被正确拒绝？撤销之后是否仍能通过隐藏入口增发？如果这些问题只能靠前端按钮颜色判断，权限设计就没有真正被验证。
+
+<Think>
+<p>为什么“撤销权限”比“把权限转给一个新的热钱包”更不可逆？如果多签成员需要更换，哪种方案会留下新的治理流程，而不是把旧承诺悄悄改写？</p>
+</Think>
+
+<MechanismDetails>
+
+```text
+require(authority == msg.senderRole)
+require(totalSupply + amount <= maxSupply)
+
+transferAuthority(multisig)
+revokeAuthority() // terminal state
+```
+
+生产系统还会使用时间锁、提案哈希、执行延迟和升级管理员。这里把复杂治理压缩成一条可重放的权限状态转换，帮助你先分清“谁能执行”和“执行内容是否合理”是两个问题。
+
+</MechanismDetails>
+
+<Checkpoint
+  id="token-authority-handoff"
+  question="把增发权限移交给 2/3 多签后，创建者单独提交 mint 应该发生什么？"
+  options={["照常成功，因为供应上限没有变化", "被拒绝，因为当前批准者已经不是创建者单签", "自动把权限转回创建者"]}
+  correctIndex={1}
+  explanation="供应上限是数量约束，权限状态是调用者约束。移交后，创建者的单独执行不满足当前权限；只有符合多签角色的模拟执行才能继续增发。"
+/>
+
+## 用四个问题审计发行器
+
+1. 上限、当前总供应和流通供应是否被分别记录？
+2. mint、transfer、claim、burn 是否各自留下了不同事件？
+3. 权限移交和撤销是否能被确定性重放？
+4. 多签降低的是密钥风险，还是也替你解决了经济决策？
+
+<SourceList>
+
+- [OpenZeppelin：AccessControl](https://docs.openzeppelin.com/contracts/5.x/access-control)
+- [OpenZeppelin：TimelockController](https://docs.openzeppelin.com/contracts/5.x/api/governance#TimelockController)
+- [Safe：多签钱包概念](https://help.safe.global/en/articles/40827-what-is-a-safe)
+
+</SourceList>

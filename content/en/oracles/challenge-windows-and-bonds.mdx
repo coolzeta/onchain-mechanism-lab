@@ -1,0 +1,52 @@
+import { LessonLead, Concept, Think, MechanismDetails, Checkpoint, SourceList } from "@/platform/components/LessonPrimitives"
+import { OracleLab } from "@/modules/oracles/components/OracleLab"
+
+<LessonLead>
+An optimistic oracle accepts a bonded report first, then gives other participants time and an economic reason to dispute it. Put the reporter and challenger on the same ledger and watch honest correction receive a reward.
+</LessonLead>
+
+## A challenge window turns immediate settlement into room for correction
+
+After the initial report, the result is not sent straight to the prediction market. The window counts down while a challenger can lock the opposite outcome and a bond. When it ends, the protocol accepts an unchallenged report or sends a conflict to arbitration.
+
+<OracleLab focus="challenge" />
+
+<Concept title="A bond is a cost function for being wrong, not proof of truth">
+<p>A bond makes a false claim expensive and gives a correct challenger a possible reward. But a bad source, expensive challenges, or collusion can still defeat the mechanism.</p>
+</Concept>
+
+<Think>
+<p>In the wrong-report scenario, report NO, challenge YES, advance both windows, and arbitrate. The challenger did not edit the first report; arbitration decides which claim matches the evidence.</p>
+</Think>
+
+<MechanismDetails>
+
+```text
+submit(report, bond)
+wait(challengeWindow)
+if challenged:
+  winner = resolve_with_evidence()
+  winner.receive(reportBond + challengeBond)
+else:
+  accept(report)
+```
+
+Production systems add multiple reporters, escalation, punishment distribution, and governance attack resistance. This lab makes locked balances and events visible first.
+
+</MechanismDetails>
+
+<Checkpoint
+  id="oracle-challenge-economics"
+  question="What do a challenge window and an economic bond provide together?"
+  options={["A way for anyone to rewrite a block", "Time and incentive for a correction to be discovered before settlement", "A guarantee that every source is always correct"]}
+  correctIndex={1}
+  explanation="The window provides time; the bond provides incentive and cost. Neither alone guarantees that outside data is correct."
+/>
+
+<SourceList>
+
+- [UMA: Disputes and arbitration](https://docs.uma.xyz/protocol-overview/how-does-umas-oracle-work)
+- [Kleros: Decentralized arbitration](https://docs.kleros.io/)
+- [Ethereum.org: Oracle design](https://ethereum.org/developers/docs/oracles/)
+
+</SourceList>

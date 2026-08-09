@@ -1,0 +1,74 @@
+import { LessonLead, Concept, Think, MechanismDetails, Checkpoint, SourceList } from "@/platform/components/LessonPrimitives"
+import { OracleLab } from "@/modules/prediction-markets/components/OracleLab"
+
+<LessonLead>
+A blockchain can execute “if YES, pay 100” precisely, but it cannot look up at the Moon. An oracle brings an outside result into the system. It solves an input and trust problem—not the problem of predicting the future.
+</LessonLead>
+
+## What happens after the market closes?
+
+At the deadline, the market stops accepting new orders and cancels unfilled orders. A designated source then publishes a result, and the oracle reports YES, NO, or invalid.
+
+If the first report were accepted immediately, a reporter's mistake or attack would decide the payout. Many designs add a challenge window, economic bonds, and dispute resolution.
+
+<OracleLab locale="en" />
+
+<Concept title="An oracle reports a fact; it does not create one">
+<p>The trading phase discovers a price. The oracle reports whether the resolution condition was met after the close. Using price as the result would confuse what people believed with what happened.</p>
+</Concept>
+
+## Perfect matching cannot repair a wrong input
+
+Imagine every signature, collateral check, and fill is correct—but the oracle writes NO when reality was YES. The system will execute the wrong payout with perfect precision.
+
+This is the “garbage in, garbage out” boundary. Oracle designs trade off speed, cost, decentralization, and correction:
+
+- **Designated source**: simple, but dependent on one source.
+- **Multi-reporter threshold**: reduces one reporter's error.
+- **Optimistic oracle**: accepts a report first and gives challengers time to object.
+- **Economic bond**: makes an incorrect report costly, without proving the source is right.
+
+<Think>
+<p>If a reporter locks 1,000 credits but can gain 100,000 from a wrong report, does the bond constrain the attack?</p>
+</Think>
+
+## Resolution is a one-time state transition
+
+Once the result is final, the market moves from `OPEN` to `RESOLVED`. Winning shares redeem 100, losing shares redeem 0, each account can claim once, and total payout cannot exceed collateral.
+
+<MechanismDetails>
+
+```text
+OPEN -> REPORT_PENDING -> DISPUTE_WINDOW -> RESOLVED
+
+redeem(account):
+  require market == RESOLVED
+  require account has not redeemed
+  payout = winningShares(account) * 100
+  mark account redeemed
+  transfer payout
+```
+
+Marking the position before transferring funds prevents double claims.
+
+</MechanismDetails>
+
+<Checkpoint
+  id="prediction-oracle-role"
+  question="What is the oracle's main job in a prediction market?"
+  options={["Predict the most likely result from the order book", "Bring the post-deadline outside result into settlement using the agreed source", "Guarantee that every trader earns a profit"]}
+  correctIndex={1}
+  explanation="The oracle handles an outside input. It does not form the price or guarantee that a prediction is correct."
+/>
+
+## You have followed one market lifecycle
+
+The six lessons now connect: a rule defines the asset; collateral funds payout; orders express budgeted views; matching creates trades; price provides a conditional signal; and the oracle brings reality back for settlement.
+
+<SourceList>
+
+- [Polymarket: resolution](https://docs.polymarket.com/polymarket-learn/markets/resolution)
+- [UMA: Optimistic Oracle](https://docs.uma.xyz/developers/optimistic-oracle-v3)
+- [Ethereum.org: oracles](https://ethereum.org/developers/docs/oracles/)
+
+</SourceList>

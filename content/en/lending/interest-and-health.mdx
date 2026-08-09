@@ -1,0 +1,62 @@
+import { LessonLead, Concept, Think, MechanismDetails, Checkpoint, SourceList } from "@/platform/components/LessonPrimitives"
+import { LendingLab } from "@/modules/lending/components/LendingLab"
+
+<LessonLead>
+Borrowing is not a one-time button. Interest accumulates onto debt, while health factor compresses “how much collateral still covers risk” into a monitorable signal. An account can approach liquidation without another user action.
+</LessonLead>
+
+## Health factor is not a return metric
+
+The lab uses a simple ratio:
+
+> `health factor = collateral value × liquidation threshold ÷ current debt`
+
+1.00 is the boundary. Above 1.00 means a buffer at the current oracle price; below 1.00 permits liquidation. It is not how much the account can earn and not a price forecast.
+
+<LendingLab locale="en" focus="health" />
+
+<Concept title="Interest turns risk into a time series">
+<p>Interest increases debt, lowers health factor, and reduces remaining borrowing room. Monitoring must record the accrual time and rule rather than only the original principal.</p>
+</Concept>
+
+## Why repayment restores room
+
+Repayment reduces both the user’s cash and protocol debt. Lower debt raises health factor and may allow a borrower to withdraw part of the collateral again. The protocol must check the post-withdrawal state before releasing assets.
+
+<Think>
+<p>If health factor moves from 1.08 to 0.99 after two interest periods while price is unchanged, what repairs it? Would a reassuring label change any state?</p>
+</Think>
+
+<MechanismDetails>
+
+```text
+accrueInterest:
+  interest = debt * ratePerPeriod
+  debt += interest
+
+repay(amount):
+  userCash -= amount
+  poolLiquidity += amount
+  debt -= amount
+
+healthFactor = collateralValue * liquidationThreshold / debt
+```
+
+Health factor is derived from state. The invariants that matter are debt, collateral, and cash flows—not the display number by itself.
+
+</MechanismDetails>
+
+<Checkpoint
+  id="lending-health-factor"
+  question="Why does health factor fall when price is unchanged but interest keeps accruing?"
+  options={["The oracle automatically lowered the price", "Debt grows while debt is the denominator of health factor", "Collateral automatically shrinks every block"]}
+  correctIndex={1}
+  explanation="With collateral value fixed, growing debt directly lowers health factor. Repayment reduces debt and restores the buffer."
+/>
+
+<SourceList>
+
+- [Aave: Health factor and liquidations](https://aave.com/help/borrowing/liquidations)
+- [MakerDAO: Stability fee and debt](https://makerdao.com/en/whitepaper/)
+
+</SourceList>

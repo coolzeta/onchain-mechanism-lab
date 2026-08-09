@@ -1,0 +1,53 @@
+import { LessonLead, Concept, Think, MechanismDetails, Checkpoint, SourceList } from "@/platform/components/LessonPrimitives"
+import { OracleLab } from "@/modules/oracles/components/OracleLab"
+
+<LessonLead>
+预言机的第一道边界不是智能合约，而是“现实证据到底有多可靠”。一条 API 返回值、一个报告者的签名和最终写入链上的结果，分别处在不同的信任层。
+</LessonLead>
+
+## 数据源不是最终事实
+
+实验室提供三种来源：多个官方记录一致、未经核验的来源冲突、以及带延迟的模糊来源。先切换它们，再揭开教学用的现实记录。来源状态会改变风险，但不会自动替协议做出报告。
+
+<OracleLab focus="sources" />
+
+<Concept title="多源一致降低风险，却不会消除定义问题">
+<p>即使多个来源返回 YES，协议仍需要回答：时间戳取哪一刻？来源冲突时谁有优先级？缺少数据时是暂停、继续等待还是使用默认值？</p>
+</Concept>
+
+## 报告者把证据变成可验证主张
+
+报告者不是现实世界本身，而是一个愿意锁定担保、对某个结果负责的参与者。报告会被其他人看到、挑战和最终化；因此系统要把“来源”“报告”“最终结果”拆成不同的状态。
+
+<Think>
+<p>如果一条价格 API 被攻击者控制，报告者照抄它并不代表报告者诚实地知道现实。你会选择增加数据源、延迟结算，还是提高错误报告的代价？</p>
+</Think>
+
+<MechanismDetails>
+
+```text
+source = collect_external_evidence()
+report = reporter.sign(outcome, bond)
+require report != source  // 不是直接复制
+open_challenge_window(report)
+```
+
+教学模拟把复杂的数据聚合压缩成三个可切换来源，但保留了工程核心：证据质量、报告责任和结算权限不能混成一个 API 调用。
+
+</MechanismDetails>
+
+<Checkpoint
+  id="oracle-source-quality"
+  question="为什么不能把单个 API 的返回值直接当成最终结果？"
+  options={["因为 API 永远不能返回 YES 或 NO", "因为来源可能延迟、冲突或被操纵，协议还需要报告责任和争议流程", "因为区块链不能保存字符串"]}
+  correctIndex={1}
+  explanation="数据源只是现实输入。报告者、挑战窗口和最终化规则共同决定下游何时可以依赖它。"
+/>
+
+<SourceList>
+
+- [UMA：Optimistic Oracle](https://docs.uma.xyz/protocol-overview/how-does-umas-oracle-work)
+- [Chainlink：Data Feeds](https://docs.chain.link/data-feeds)
+- [Ethereum.org：预言机](https://ethereum.org/developers/docs/oracles/)
+
+</SourceList>

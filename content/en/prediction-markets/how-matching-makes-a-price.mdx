@@ -1,0 +1,71 @@
+import { LessonLead, Concept, Think, MechanismDetails, Checkpoint, SourceList } from "@/platform/components/LessonPrimitives"
+import { MatchingLab } from "@/modules/prediction-markets/components/MatchingLab"
+
+<LessonLead>
+An order book is a set of promises that have not met yet. The matching engine looks for a bid that is at least as high as an ask, then uses public priority rules to turn the pair into a trade.
+</LessonLead>
+
+## Best bid, best ask, and spread
+
+Buy orders sort from high to low; the highest is the **best bid**. Sell orders sort from low to high; the lowest is the **best ask**. The gap between them is the spread.
+
+If the best bid is 58 and the best ask is 66, neither side accepts the other. A new BUY YES at 70 crosses the 66 ask and creates an executable match.
+
+<MatchingLab locale="en" />
+
+## Why the trade uses the earlier order's price
+
+Suppose Bob's `ASK 65` has been resting in the book. Carol later submits `BID 70`. Any price from 65 through 70 could satisfy both, so the engine needs a deterministic rule.
+
+Here the trade uses the resting order price: Bob committed to 65 first, so Carol crosses the spread at 65. She pays less than her limit and Bob receives the price he made public.
+
+<Concept title="A limit is an acceptable boundary, not a command for the exact fill">
+<p>BUY YES @ 70 means “70 or better,” not “must fill at 70.” It can execute at a better price, or remain unfilled.</p>
+</Concept>
+
+## At one price, time decides
+
+If Alice and Carol both bid 65 while Bob offers only 2 shares, the earlier order fills first. Price-time priority works as follows:
+
+1. Better prices have priority.
+2. Equal prices are ordered by sequence number.
+3. If quantity is insufficient, one order partially fills and the remainder waits.
+
+The same rule also makes the system replayable: identical order input produces identical fills for every verifier.
+
+<Think>
+<p>What remains after BUY YES @70 ×10 meets ASK 64 ×3 and ASK 68 ×4? How many trade prices appear?</p>
+</Think>
+
+<MechanismDetails>
+
+```text
+while bestBid.price >= bestAsk.price:
+  maker = earlier(bestBid, bestAsk)
+  quantity = min(bestBid.remaining, bestAsk.remaining)
+  trade(price = maker.price, quantity)
+  lockCollateral(quantity * 100)
+```
+
+After every fill, the engine checks again until the best bid is strictly below the best ask.
+
+</MechanismDetails>
+
+<Checkpoint
+  id="price-time-priority"
+  question="An ASK 65 rests first. A BUY YES @70 arrives later. What is the usual trade price?"
+  options={["70, because that is the buyer's maximum", "67.5, because the midpoint is always used", "65, because the resting order's price is used"]}
+  correctIndex={2}
+  explanation="A limit defines an acceptable boundary. The aggressive order meets the resting order at its public price."
+/>
+
+## State passed to the next lesson
+
+The market now has trades and a latest price. Next we challenge a common shortcut: a last price of 70 does not mean the world has discovered an objective, permanent 70% probability.
+
+<SourceList>
+
+- [Polymarket: placing and matching orders](https://docs.polymarket.com/trading/orders/create)
+- [Nasdaq: price/time priority](https://www.nasdaqtrader.com/content/ProductsServices/Trading/ClosingCrossfaq.pdf)
+
+</SourceList>

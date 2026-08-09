@@ -1,0 +1,31 @@
+{
+  "site": {
+    "name": "链上机制实验室",
+    "shortName": "机制实验室",
+    "tagline": "用互动课程解释链上系统如何运转。",
+    "educationNotice": "所有资产均为虚拟积分，仅用于教育演示。"
+  },
+  "nav": {
+    "primary": "主导航",
+    "explore": "探索",
+    "learn": "学习路径",
+    "curriculum": "课程目录",
+    "flow": "系统关系",
+    "challenge": "系统挑战",
+    "lab": "实验室",
+    "glossary": "术语表",
+    "progress": "学习进度",
+    "journal": "实验记录",
+    "tools": "学习工具",
+    "toolsDescription": "课程之外的辅助页面，可以按需要使用。",
+    "flowDescription": "查看不同链上系统之间的依赖关系。",
+    "labDescription": "自由调整参数，比较不同场景的结果。",
+    "challengeDescription": "用十道题综合复习多门课程。",
+    "glossaryDescription": "查找术语的简要解释和相关课程。",
+    "journalDescription": "保存实验状态，并比较不同实验结果。"
+  },
+  "locale": {
+    "switchTo": "English",
+    "current": "中文"
+  }
+}

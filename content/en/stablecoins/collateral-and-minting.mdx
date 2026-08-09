@@ -1,0 +1,59 @@
+import { LessonLead, Concept, Think, MechanismDetails, Checkpoint, SourceList } from "@/platform/components/LessonPrimitives"
+import { StablecoinLab } from "@/modules/stablecoins/components/StablecoinLab"
+
+<LessonLead>
+Issuing a stablecoin is not borrowing the full market value of collateral. The protocol must ask what remains if collateral falls or a price update arrives late. A minimum collateral ratio turns that question into an executable ceiling.
+</LessonLead>
+
+## Why $100 can mint only about 66 tokens
+
+Suppose each USD-LAB targets $1 and the minimum collateral ratio is 150%. If you deposit $100 of collateral, the theoretical maximum issuance is:
+
+```text
+maxMint = collateralValue / targetPrice / 150%
+        = 100 / 1 / 1.5
+        ≈ 66 USD-LAB
+```
+
+The remaining $50 is not idle capital. It is the buffer that absorbs price shocks, liquidation discounts, and trading friction.
+
+<StablecoinLab locale="en" focus="collateral" />
+
+<Concept title="The collateral ratio describes both efficiency and safety">
+<p>A ratio closer to 100% is more capital-efficient, but a small price fall can make the reserve insufficient for the stablecoin liability. A higher ratio absorbs more volatility while requiring the issuer to lock more assets.</p>
+</Concept>
+
+<Think>
+<p>If collateral falls from $1.00 to $0.70, how much buffer remains after issuing at a 150% minimum ratio? Do not look only at the issuance number; calculate reserve value and liability value first.</p>
+</Think>
+
+<MechanismDetails>
+
+```text
+liabilityValue = supply × targetPrice
+collateralRatio = reserveValue / liabilityValue
+require collateralRatio >= minimumRatio
+```
+
+The protocol checks the ceiling when minting, but it must keep reading collateral prices afterward. Being allowed to mint does not mean the position stays safe forever; state changes with price and liability.
+
+</MechanismDetails>
+
+<Checkpoint
+  id="stablecoin-collateral-ratio"
+  question="With $100 of collateral and a 150% minimum ratio, how many $1 stablecoins can theoretically be minted?"
+  options={["About 66, because issuance must stay below collateral value and leave a 50% buffer", "100, because the collateral is worth $100", "150, because a higher ratio allows more issuance"]}
+  correctIndex={0}
+  explanation="A 150% minimum ratio means every $1 of liability needs $1.50 of collateral, so $100 supports about $66 of liability."
+/>
+
+## The state you carry forward
+
+The issuance ceiling is the intersection of collateral price, target price, and risk buffer. Next, let the market price depeg and see what redemption and arbitrage can—and cannot—repair.
+
+<SourceList>
+
+- [MakerDAO: Liquidation 2.0 and collateral risk](https://docs.makerdao.com/smart-contract-modules/dog-and-clipper-detailed-documentation)
+- [Aave: Health factor and collateral risk](https://aave.com/help/borrowing/health-factor)
+
+</SourceList>

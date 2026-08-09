@@ -1,0 +1,62 @@
+import { LessonLead, Concept, Think, MechanismDetails, Checkpoint, SourceList } from "@/platform/components/LessonPrimitives"
+import { LedgerLab } from "@/modules/ledger/components/LedgerLab"
+
+<LessonLead>
+链上系统的关键不是“谁先写入数据库”，而是所有节点能否从相同输入得到相同输出。本章把交易放进连续区块，再从创世状态重放，观察顺序、哈希和状态根如何互相约束。
+</LessonLead>
+
+## 顺序本身就是状态的一部分
+
+Alice 先给你转账，再由你给 Bob 转账，和反过来的顺序并不总是等价：Nonce、余额、抵押和清算边界都可能在每一步改变。区块因此要承诺交易顺序，而不能只承诺“这一批交易出现过”。
+
+<LedgerLab focus="replay" />
+
+点击“打包区块”，再验证整条链。实验室会从三个账户各有 1,000 积分的创世状态开始，按区块顺序重放每笔交易，重新计算余额、Nonce 和状态根。
+
+<Concept title="哈希不是共识本身，而是可验证的承诺">
+<p>区块哈希引用前一个哈希、交易指纹和执行后的状态根。任何字段被修改，后续节点都可以在重放时发现承诺不再匹配。</p>
+</Concept>
+
+## 状态根压缩了“执行结果”
+
+状态根不是把所有账户余额展示在区块头里，而是把这组状态压缩成一个确定性摘要。两个节点拿到相同的前状态和顺序，应该得到相同的状态根；如果不相同，就需要追查执行规则、交易输入或客户端实现。
+
+<Think>
+<p>如果两个节点看到同一组交易，但其中一个先执行了第二笔，为什么它们可能得到不同的 Nonce 或余额？因为状态转换不是无序集合运算，前一步的结果会成为后一步的输入。</p>
+</Think>
+
+<MechanismDetails>
+
+```text
+replay(chain):
+  state = genesis
+  for block in chain:
+    require block.previousHash == previous.hash
+    for tx in block.transactionIds:
+      apply_or_reject(state, tx)
+    require block.stateRoot == hash(state)
+```
+
+教学模拟把复杂的 Merkle Patricia Trie 压缩成确定性账户摘要，但保留了最重要的工程习惯：执行和验证使用同一套纯规则，测试可以完整重放。
+
+</MechanismDetails>
+
+<Checkpoint
+  id="state-root-replay"
+  question="状态根最重要的用途是什么？"
+  options={["把钱包界面变得更漂亮", "承诺执行后的全局状态，帮助节点发现重放分歧", "让 Pending 交易自动获得余额"]}
+  correctIndex={1}
+  explanation="状态根是执行结果的确定性摘要。相同输入却得到不同状态根，说明节点之间存在状态分歧或数据被改动。"
+/>
+
+## 把重放思维带到其他模块
+
+AMM 的储备、预测市场的锁定抵押、代币的总供应和预言机的结算结果，都应该能被表达为状态转换。越复杂的金融机制，越需要清楚记录输入顺序、成功条件和失败时不变的字段。
+
+<SourceList>
+
+- [Ethereum.org：区块](https://ethereum.org/developers/docs/blocks/)
+- [Ethereum.org：执行层状态](https://ethereum.org/developers/docs/intro-to-ethereum/#state)
+- [Ethereum Yellow Paper：区块与状态](https://ethereum.github.io/yellowpaper/paper.pdf)
+
+</SourceList>

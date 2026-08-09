@@ -1,0 +1,63 @@
+import { LessonLead, Concept, Think, MechanismDetails, Checkpoint, SourceList } from "@/platform/components/LessonPrimitives"
+import { TokenLaunchLab } from "@/modules/token-launch/components/TokenLaunchLab"
+
+<LessonLead>
+代币分配表写下“最后属于谁”，锁仓时间表写下“什么时候可以使用”。两者不是同一个字段：如果把它们混成一个余额，学习者和市场都会误判未来会有多少供应进入流通。
+</LessonLead>
+
+## 一笔分配有四个状态
+
+在实验室里，创建者和社区的锁仓已经计入总供应，但还不能转账。推进阶段只会增加**可解锁额度**，领取动作才会把这部分代币移动到持有人的可用余额。
+
+<TokenLaunchLab focus="vesting" />
+
+可以把一份锁仓计划拆成四个问题：分配总额是多少？已经领取多少？当前阶段解锁多少？持有人是否真的领取？只有最后一个问题为真，代币才进入流通余额。
+
+<Concept title="供应悬垂是未来可能进入市场的压力">
+<p>锁仓不等于没有稀释风险。400,000 LAB 仍然计入总供应，只是当前不可用；当它们解锁并被领取，市场的可见供应可能增加。研究代币时，流通供应和完全稀释后的分配必须同时看。</p>
+</Concept>
+
+## 时间推进不是自动转账
+
+一个时间戳只改变协议允许领取的上限，不代表持有人已经提交领取交易。主动领取的设计让事件日志能够回答：哪一笔代币何时从锁仓变成可用，是否重复领取，余额和总供应是否仍然守恒。
+
+<Think>
+<p>如果阶段已经推进但社区没有领取，流通供应应该增加吗？不会。可解锁额度增加了，但 liquid 余额与流通供应只有在 claim 后才改变。</p>
+</Think>
+
+<MechanismDetails>
+
+```text
+unlocked = floor(schedule.total × phaseBps / 10_000)
+claimable = unlocked - schedule.claimed
+claim(holder):
+  balance[holder] += claimable
+  schedule.claimed += claimable
+```
+
+生产合约还必须确定区块时间、舍入方向、撤销条款和受益人变更权限。教学内核刻意保留整数和确定性阶段，让每次领取都能重放验证。
+
+</MechanismDetails>
+
+<Checkpoint
+  id="token-vesting-states"
+  question="推进到下一期但还没有点击领取时，哪种说法正确？"
+  options={["总供应和流通供应都会增加", "可领取额度增加，但流通余额和总供应暂时不变", "锁仓代币被销毁，供应减少"]}
+  correctIndex={1}
+  explanation="时间推进只改变领取上限。领取前，代币仍在锁仓计划里；它已经计入总供应，但还没有进入可用余额。"
+/>
+
+## 用一张表检查锁仓
+
+1. 计划总额是否已经算进总供应？
+2. claimed 是否永远不超过当前解锁上限？
+3. 领取后是 liquid 增加、locked 减少，而不是 totalSupply 增加吗？
+4. 团队、社区和投资人的解锁时间是否会在同一阶段集中到期？
+
+<SourceList>
+
+- [OpenZeppelin：VestingWallet](https://docs.openzeppelin.com/contracts/5.x/api/finance#VestingWallet)
+- [Ethereum.org：代币标准](https://ethereum.org/developers/docs/standards/tokens/erc-20/)
+- [SEC：加密资产与披露风险](https://www.sec.gov/spotlight/cybersecurity-enforcement-actions)
+
+</SourceList>

@@ -1,0 +1,55 @@
+import { LessonLead, Concept, Think, MechanismDetails, Checkpoint, SourceList } from "@/platform/components/LessonPrimitives"
+import { LedgerLab } from "@/modules/ledger/components/LedgerLab"
+
+<LessonLead>
+看到交易出现在区块里，不等于应用可以立刻把它当成永远不会改变的事实。本章连续生成区块，再推进一个简化的最终性开关，区分“已经被包含”“有了确认”和“可以安全依赖”。
+</LessonLead>
+
+## 区块高度、确认数和最终性
+
+区块高度回答“链走到了哪里”；确认数回答“这个区块后面又接了多少层”；最终性回答“在当前规则下，应用是否可以依赖它而不再等待”。不同链的共识机制给出不同的最终性保证，实验室用逐块推进的方式先建立直觉。
+
+<LedgerLab focus="finality" />
+
+先打包第一笔交易，再连续生成空交易区块，最后点击“推进最终性”。你会看到链高可以继续增长，而最终性高度按自己的节奏前进。
+
+<Concept title="确认数是缓冲，不是一个跨链统一的魔法数字">
+<p>等待更多区块通常会增加重组成本，但它不等价于所有网络都已经达到同一种经济或共识最终性。桥、交易所和借贷协议会根据风险选择自己的等待策略。</p>
+</Concept>
+
+<Think>
+<p>如果预测市场在预言机报告刚出现的区块就立刻发奖，而这条链随后发生重组，会发生什么？应用需要定义哪些状态可以被依赖，以及回滚时如何处理资金和事件。</p>
+</Think>
+
+<MechanismDetails>
+
+```text
+if block.height <= finalizedHeight:
+  application_may_depend_on(block)
+else:
+  wait_for_more_confirmations()
+```
+
+真实网络会用 PoS 投票、经济惩罚或其他共识规则计算最终性。这个实验室只模拟“区块被生产”和“应用选择推进最终性”的分离。
+
+</MechanismDetails>
+
+<Checkpoint
+  id="ledger-finality"
+  question="一个区块被挖出后，为什么应用还可能等待？"
+  options={["因为区块里没有交易", "因为后续确认和共识最终性决定它是否足够安全、可被依赖", "因为余额只有在用户刷新网页后才会改变"]}
+  correctIndex={1}
+  explanation="包含是一次状态转换，确认和最终性是对这次转换未来稳定性的额外保证。金融应用通常会把风险和等待时间一起设计。"
+/>
+
+## 一条底层主线
+
+现在可以把四章串起来：签名授权交易，交易池等待排序，区块执行并承诺状态根，确认和最终性决定上层应用何时安全依赖结果。预测市场、AMM、代币发行和撮合引擎只是把更多状态与约束接在这条主线上。
+
+<SourceList>
+
+- [Ethereum.org：共识与最终性](https://ethereum.org/developers/docs/consensus-mechanisms/pos/#finality)
+- [Ethereum.org：区块确认](https://ethereum.org/developers/docs/blocks/)
+- [Ethereum.org：重组与链头](https://ethereum.org/developers/docs/intro-to-ethereum/#fork-choice)
+
+</SourceList>

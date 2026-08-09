@@ -1,0 +1,63 @@
+import { LessonLead, Concept, Think, MechanismDetails, Checkpoint, SourceList } from "@/platform/components/LessonPrimitives"
+import { LendingLab } from "@/modules/lending/components/LendingLab"
+
+<LessonLead>
+A lending protocol does not read every market trade directly. It depends on an oracle to write a verifiable price into risk logic. A market crash does not mean the protocol has seen it, and a wrong oracle price does not make a position safe.
+</LessonLead>
+
+## Put two prices side by side
+
+The lab shows:
+
+- **Market price**: what outside traders would trade at now.
+- **Oracle price**: what the protocol currently uses for collateral value, capacity, and liquidation.
+
+If market price falls to 72 while the oracle remains at 120, health factor can still look high. Only an oracle update recomputes the boundary.
+
+<LendingLab locale="en" focus="oracle" />
+
+<Concept title="An oracle is an input to the liquidation state machine">
+<p>Every price update can change capacity, health, and liquidation status. Delay, source quality, and update thresholds decide how much risk the system leaves onchain.</p>
+</Concept>
+
+## Debt after collateral is exhausted is bad debt
+
+If price moves too fast or collateral was insufficient, a liquidator can repay only what the seized assets cover. Any remaining liability has no matching asset. That is not an ordinary pending order; it is a gap the protocol must absorb.
+
+Buffers include lower LTV, insurance, reserves, liquidation incentives, and better data sources. None guarantees zero bad debt; each changes its probability and who bears it.
+
+<Think>
+<p>If an oracle price is far above the real market, a borrower takes on too much debt, and price then corrects sharply, who is hit first: borrower, liquidator, or protocol reserves? Follow the asset flows.</p>
+</Think>
+
+<MechanismDetails>
+
+```text
+marketPrice != oraclePrice
+
+healthFactor = value(oraclePrice) * threshold / debt
+if marketPrice moves first:
+  risk is invisible until oracle updates
+
+if all collateral is seized and debt > 0:
+  badDebt = debt
+```
+
+Onchain execution is deterministic relative to the input it reads; it cannot prove that the input is the correct real-world price.
+
+</MechanismDetails>
+
+<Checkpoint
+  id="lending-oracle-bad-debt"
+  question="What is the most accurate description when market price falls but the oracle still returns the old price?"
+  options={["The protocol already liquidated, but the UI has not refreshed", "The protocol calculates with the old price, so risk can be understated until an update exposes the boundary", "Market and oracle prices must always be identical"]}
+  correctIndex={1}
+  explanation="Risk logic can only use the price it has read. Stale or wrong input delays liquidation and can leave insufficient collateral and bad debt."
+/>
+
+<SourceList>
+
+- [Aave: Risk parameters and liquidations](https://aave.com/help/borrowing/health-factor)
+- [Chainlink: DeFi data feeds](https://docs.chain.link/data-feeds)
+
+</SourceList>

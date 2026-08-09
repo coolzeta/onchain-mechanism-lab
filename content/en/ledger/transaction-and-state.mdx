@@ -1,0 +1,88 @@
+import { LessonLead, Concept, Think, MechanismDetails, Checkpoint, SourceList } from "@/platform/components/LessonPrimitives"
+import { LedgerLab } from "@/modules/ledger/components/LedgerLab"
+
+<LessonLead>
+Onchain finance eventually reduces to one question: can every node verify the next state transition from the same previous state? We will start with one transfer instead of memorizing consensus vocabulary.
+</LessonLead>
+
+## A transaction is more than “send money”
+
+Each account in the lab has a balance and a **nonce**. A transaction includes the sender, recipient, amount, and nonce. The signature proves that whoever controls the key authorized this exact set of fields; it does not prove that the account has enough funds, or that the transaction has already been confirmed.
+
+<LedgerLab />
+
+The lifecycle has four distinct steps:
+
+1. **Sign**: the sender signs the transaction fields with a private key.
+2. **Broadcast**: nodes place it in a pending pool and verify the signature.
+3. **Include**: a block producer selects transactions and executes state transitions in order.
+4. **Confirm**: later blocks reference the chain, so replaying the same inputs produces the same result.
+
+<Concept title="A signature authorizes data, not an abstract intention">
+<p>If someone changes 120 to 400 after broadcast, the original signature no longer covers the transaction. A node should reject it instead of guessing what the sender meant.</p>
+</Concept>
+
+## A nonce belongs to account state
+
+Without a nonce, the same signed transfer could be broadcast repeatedly. A nonce creates an account-local sequence: an account expecting 0 becomes 1 after a successful execution, and the next valid transaction must use 1.
+
+Try broadcasting a future nonce and mine a block. The transaction is recorded as rejected, while the balance and nonce stay unchanged. A failed attempt may appear in the block index, but it must not become a successful state transition.
+
+<Think>
+<p>Broadcast a valid transaction, then tamper with its amount before mining. Why can the node not “reuse the old signature”? Because the signature protects the original combination of amount and nonce.</p>
+</Think>
+
+## A block fixes order and summarizes state
+
+A block is not a magical database write. It records an ordered list of transactions, the previous block hash, and a state root computed after execution. Nodes replay the list: subtract from the sender, add to the recipient, increment the sender nonce, and compute the new state summary.
+
+<MechanismDetails>
+
+```text
+verify(tx):
+  check signature(tx.from, tx.fields)
+  check tx.nonce == account[tx.from].nonce
+  check account[tx.from].balance >= tx.amount
+
+apply(tx):
+  account[tx.from].balance -= tx.amount
+  account[tx.to].balance += tx.amount
+  account[tx.from].nonce += 1
+  stateRoot = hash(all accounts and nonces)
+```
+
+Production chains add fees, gas, signature schemes, transaction-pool policies, block proposals, and finality. This lab compresses cryptography into a deterministic signature digest so the state transition remains visible.
+
+</MechanismDetails>
+
+## The ledger is every other mechanism’s foundation
+
+Collateral in a prediction market, reserves in an AMM, total supply in a token launch, and a finalized oracle result are all state changes applied to a ledger. Once you understand the ledger, you can ask of any mechanism: who authorized this change, can it be replayed, and what should remain unchanged when it fails?
+
+<Checkpoint
+  id="transaction-basics"
+  question="Why is a signed transaction rejected after its amount is changed?"
+  options={["Because blockchains reject every transfer", "Because the signature covers the amount, so the changed fields no longer match", "Because the recipient did not open a webpage"]}
+  correctIndex={1}
+  explanation="A signature is authorization over specific fields, not decoration around a transaction ID. Changing the amount, recipient, or nonce must invalidate verification."
+/>
+
+## Five questions for reading an onchain transaction
+
+After the lab, explain:
+
+1. What does signature verification answer, and what does balance verification answer?
+2. Why should a nonce advance only after a successful state transition?
+3. How is a pending transaction different from a confirmed one?
+4. How does a block commit to transaction order and chain continuity?
+5. How can a state root reveal that two nodes executed different results?
+
+These questions are the shared entry point for tokens, exchanges, lending, and liquidation. More complex financial mechanisms do not escape the ledger; they add more state and more constraints on top of it.
+
+<SourceList>
+
+- [Ethereum.org: Transactions](https://ethereum.org/developers/docs/transactions/)
+- [Ethereum.org: Accounts and nonces](https://ethereum.org/developers/docs/accounts/)
+- [Ethereum Yellow Paper: State transitions and blocks](https://ethereum.github.io/yellowpaper/paper.pdf)
+
+</SourceList>

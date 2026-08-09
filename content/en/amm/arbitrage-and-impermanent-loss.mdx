@@ -1,0 +1,62 @@
+import { LessonLead, Concept, Think, MechanismDetails, Checkpoint, SourceList } from "@/platform/components/LessonPrimitives"
+import { AMMLab } from "@/modules/amm/components/AMMLab"
+
+<LessonLead>
+An AMM only knows its own reserve ratio. When outside prices disagree, arbitrageurs trade against the pool and pay the costs of moving its quote back toward the market. The LP’s inventory change happens along that path.
+</LessonLead>
+
+## Create a price gap
+
+Move the external price to 150 credits per TOKEN. If the pool is still near 120, TOKEN is cheap inside the pool. The arbitrageur buys TOKEN with credits until the pool price approaches the external reference.
+
+<AMMLab locale="en" focus="arbitrage" />
+
+Arbitrage does not create value from nothing. The trader pays fees and price impact; the opportunity comes from the gap, while the pool receives a new reserve mix plus fees.
+
+<Concept title="Arbitrage is not a forecast; it aligns two quotes">
+<p>When the gap exceeds trading costs, someone has an incentive to trade. Afterward, the pool price is closer to outside markets, but the TOKEN / credit mix owned by LPs has changed.</p>
+</Concept>
+
+## Why impermanent loss belongs beside the exit
+
+The lab values your current LP inventory against what the original deposit would be worth if held in a wallet. The difference appears as prices move and becomes realized when you withdraw. Fees can offset or exceed it, but “impermanent” does not mean “risk-free.”
+
+<Think>
+<p>If TOKEN rises from 120 to 150 outside the pool, will an arbitrageur remove TOKEN from the pool or sell TOKEN into it? First decide whether TOKEN is cheap or expensive inside the pool.</p>
+</Think>
+
+<MechanismDetails>
+
+```text
+if poolPrice < externalPrice:
+  arbitrageur swaps X for Y
+else:
+  arbitrageur swaps Y for X
+
+fees stay in reserves
+LP position = reserves × (LP shares / total shares)
+```
+
+Real protocols need an external reference, minimum-output protection, MEV-aware execution, and limits against extreme reserves. This lab keeps the price gap, fee, and inventory change in one event log.
+
+</MechanismDetails>
+
+<Checkpoint
+  id="amm-arbitrage"
+  question="When TOKEN is cheaper in the pool than outside, what does an arbitrageur usually do?"
+  options={["Buy TOKEN from the pool with credits, making TOKEN scarcer inside", "Sell TOKEN into the pool, making TOKEN more abundant", "Do nothing because the AMM reads the outside price automatically"]}
+  correctIndex={0}
+  explanation="The arbitrageur buys the relatively cheap TOKEN. Credits enter and TOKEN leaves, pushing the pool price toward the external price; the AMM does not read outside prices by itself."
+/>
+
+## Follow risk through the system
+
+A mature AMM must answer where the outside price comes from, who pays for rebalancing, how LPs understand inventory, how traders cap worst-case output, and who can pause or upgrade the system. Remembering x · y = k is remembering the curve; tracing the assets and incentives is understanding the market.
+
+<SourceList>
+
+- [Uniswap v2: How Uniswap works](https://docs.uniswap.org/contracts/v2/concepts/protocol-overview/how-uniswap-works)
+- [Uniswap v2: Fees](https://docs.uniswap.org/contracts/v2/concepts/protocol-overview/fees)
+- [Paradigm: Understanding Automated Market Makers](https://www.paradigm.xyz/2021/04/understanding-automated-market-makers-part-1)
+
+</SourceList>

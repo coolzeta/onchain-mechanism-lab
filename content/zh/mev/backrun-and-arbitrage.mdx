@@ -1,0 +1,57 @@
+import { LessonLead, Concept, Think, MechanismDetails, Checkpoint, SourceList } from "@/platform/components/LessonPrimitives"
+import { MEVLab } from "@/modules/mev/components/MEVLab"
+
+<LessonLead>
+用户的一笔大交换可能把池内价格推离外部参考。回跑者不需要抢在用户前面，它只要确保自己在用户之后执行，就能对着已经改变的储备取另一边。
+</LessonLead>
+
+## 价格差从哪里来
+
+用户用积分买 TOKEN 后，池子里的 TOKEN 变少、积分变多，池内价格上升。这个状态可能暂时偏离其他市场的价格。搜索者看到用户交易后，在同一个区块里卖出 TOKEN，赚取一部分由新状态产生的价差。
+
+<MEVLab focus="backrun" />
+
+实验室把搜索者的初始 TOKEN、积分、池内储备、搜索者盈亏和提议者排序小费放在一起显示。观察回跑并不创造新的 TOKEN：它只是让库存和价格再移动一次。
+
+<Concept title="套利收益来自不同意愿的交换，不是系统凭空发钱">
+<p>用户愿意为即时成交承受价格冲击，池子按照曲线报价，回跑者愿意在另一侧交易。利润是这几次交换之间的资产转移；手续费和排序小费则是明确记录的成本。</p>
+</Concept>
+
+<Think>
+<p>如果没有用户先执行的大单，回跑者还能以同样价格成交吗？这正是 back-run 与普通独立交易的区别：它依赖前一笔状态变化。</p>
+</Think>
+
+<MechanismDetails>
+
+```text
+poolPrice_before = pool.quote()
+execute(victim)
+poolPrice_after = pool.quote()
+if poolPrice_after != externalReference:
+    execute(searcher_backrun)
+    pay(ordering_tip)
+```
+
+回跑策略还可能跨多个池子、借用闪电贷或与清算结合。教学模型先保留一条池子和一条确定性排序，重点是把依赖关系和资产流说清楚。
+
+</MechanismDetails>
+
+<Checkpoint
+  id="mev-backrun-arbitrage"
+  question="为什么回跑套利必须依赖用户先执行？"
+  options={["因为用户交易先改变了池子储备和报价，回跑者才有可利用的状态差", "因为回跑者不能自己提交交易", "因为协议会在用户成交后凭空发放套利奖励"]}
+  correctIndex={0}
+  explanation="回跑者利用的是前一笔交易留下的价格/库存状态。收益来自后续交换和外部参考之间的差异，而不是协议凭空发放的奖励。"
+/>
+
+## 把提议者放进账本
+
+排序权本身也有价格。实验室中搜索者支付一个明确的小费给区块提议者；真实系统可能通过 bundle、gas、builder 竞价和其他支付路径实现。无论形式如何，都要问：谁承担成本，谁获得收入，谁拥有拒绝或重排的权力。
+
+<SourceList>
+
+- [Flashbots：搜索者与 bundles](https://docs.flashbots.net/flashbots-auction/searchers/understanding-bundles)
+- [Ethereum.org：MEV 解释](https://ethereum.org/en/developers/docs/mev/)
+- [Uniswap：套利如何重新平衡池子](https://docs.uniswap.org/contracts/v2/concepts/protocol-overview/how-uniswap-works)
+
+</SourceList>

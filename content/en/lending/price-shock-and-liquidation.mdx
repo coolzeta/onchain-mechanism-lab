@@ -1,0 +1,60 @@
+import { LessonLead, Concept, Think, MechanismDetails, Checkpoint, SourceList } from "@/platform/components/LessonPrimitives"
+import { LendingLab } from "@/modules/lending/components/LendingLab"
+
+<LessonLead>
+Liquidation is not a protocol suddenly confiscating everything. It is a prewritten boundary: once oracle-valued collateral no longer covers the safety threshold, a liquidator repays debt and receives collateral with a defined incentive.
+</LessonLead>
+
+## Calculate a liquidation price first
+
+If collateral quantity is fixed, an approximate line is:
+
+> `liquidation price = debt ÷ (collateral quantity × liquidation threshold)`
+
+This is not a forecast. It is the price at which health factor would reach 1.00. Real execution also considers bonus, auction depth, fees, and latency.
+
+<LendingLab locale="en" focus="liquidation" />
+
+## Where does the liquidator’s incentive come from?
+
+A liquidator is not a charity. It uses its own credits to repay debt, receives collateral, and may receive a 5% bonus. The bonus compensates gas, price movement, and execution risk; too low may leave no keeper, while too high increases borrower loss.
+
+<Concept title="Liquidation converts one risk into two verifiable state changes">
+<p>Debt falls and protocol liquidity rises; borrower collateral falls and liquidator collateral rises. The bonus is paid from seized collateral, not minted from nowhere.</p>
+</Concept>
+
+<Think>
+<p>If health factor is 0.92 but the liquidator lacks funds or market depth is thin, will the protocol create money to fill the gap? If not, where does the risk land?</p>
+</Think>
+
+<MechanismDetails>
+
+```text
+require healthFactor < 1.00
+repay = min(debt, collateralValue / (1 + liquidationBonus))
+seize = repay * (1 + liquidationBonus) / oraclePrice
+
+liquidator.cash -= repay
+protocol.liquidity += repay
+borrower.debt -= repay
+borrower.collateral -= seize
+```
+
+If all collateral is seized and debt remains, the remainder is bad debt that must be absorbed by reserves, insurance, or another participant.
+
+</MechanismDetails>
+
+<Checkpoint
+  id="lending-liquidation-boundary"
+  question="What does a liquidator mainly do once health factor falls below 1.00?"
+  options={["Repay debt with its own assets and receive collateral under the rules", "Force the collateral price back to its old value", "Make the borrower’s debt disappear without moving any assets"]}
+  correctIndex={0}
+  explanation="Liquidation has an asset flow: the keeper repays, collateral moves, and the incentive comes from the seized collateral."
+/>
+
+<SourceList>
+
+- [Aave: Liquidations](https://aave.com/help/borrowing/liquidations)
+- [Chainlink: Price data and lending risk](https://chain.link/education-hub/defi-lending)
+
+</SourceList>

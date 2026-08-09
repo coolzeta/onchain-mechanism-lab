@@ -1,0 +1,92 @@
+import { LessonLead, Concept, Think, MechanismDetails, Checkpoint, SourceList } from "@/platform/components/LessonPrimitives"
+import { OracleLab } from "@/modules/oracles/components/OracleLab"
+
+<LessonLead>
+链上代码可以验证余额、签名和状态转换，却不能自己看见窗外的比赛、天气或发射记录。预言机要解决的不是“怎么请求一个 API”，而是：当一个事实会触发真实赔付时，谁有资格报告、谁能挑战、错误要付出什么代价？
+</LessonLead>
+
+## 数据源、报告和最终结果不是同一个东西
+
+预测市场问的是“2028 年前，人类会再次踏上月球吗？”。这句话的价格可以在链上变化，但“是否发生”仍然要从链外获得。一个完整的预言机流程至少包含三层：
+
+1. **数据源**：官方记录、多个 API 或人工证据，它们描述现实，但可能延迟、冲突或被操纵。
+2. **初始报告**：一个参与者把结果写成 YES/NO，并锁定担保金。
+3. **最终结果**：挑战窗口结束、争议处理完成后，才允许预测市场读取并赔付。
+
+<OracleLab />
+
+<Concept title="价格是对信息的反应，不是事实本身">
+<p>市场价格可以提示参与者“大家目前相信什么”，但它不能替代现实证据。错误报告可能让一个错误结果暂时成为共识；只有明确的挑战和结算协议，才有机会把错误纠正回来。</p>
+</Concept>
+
+## 为什么要有挑战窗口
+
+如果一个报告提交后立刻结算，数据源的瞬时错误、延迟或恶意行为都会直接变成赔付。挑战窗口给其他参与者一个公开时间段：他们可以提交相反结果，并用自己的担保金证明自己愿意承担责任。
+
+实验室把挑战窗口简化成两个区块。推进窗口只改变时间，不改变报告；只有窗口结束后，系统才允许最终化或进入仲裁。真实协议可能使用时间戳、争议轮次、投票或去中心化验证，但核心问题相同：**错误什么时候被发现，发现错误的人为什么愿意站出来？**
+
+<Think>
+<p>在“错误初报”场景里，先报告 NO，不发起挑战，推进两个窗口并最终化。你会看到错误结果也能被协议接受。再重置，报告 NO 后挑战 YES，比较担保金和最终结果的差异。</p>
+</Think>
+
+## 经济担保把意见变成可追责的承诺
+
+Primary Reporter 和 Challenger 都要锁定积分。没有挑战时，报告者拿回自己的担保，但结果可能仍然错；有挑战时，仲裁者读取现实证据，正确一方拿走双方担保，错误一方承担损失。
+
+这不是保证“永远正确”的魔法。它只是把攻击成本、发现奖励和时间窗口写进了状态机。攻击者仍然可能控制数据源、串通参与者，或者让诚实参与者的挑战成本高到不愿行动。
+
+<MechanismDetails>
+
+```text
+submit(outcome, stake):
+  lock(reporter, stake)
+  open(challengeWindow)
+
+challenge(oppositeOutcome, stake):
+  lock(challenger, stake)
+
+after window:
+  if no challenge:
+    finalize(reportedOutcome)
+  else:
+    winner = evidence == reportedOutcome ? reporter : challenger
+    winner receives both stakes
+```
+
+生产系统还需要多源聚合、信誉、提交/揭示、治理、抗女巫和升级权限。教学内核把这些复杂度压缩成可观察的担保和事件，让你先看清楚信任边界在哪里。
+
+</MechanismDetails>
+
+## 错误结果为什么不能靠市场自己修复
+
+预测市场的订单簿只知道交易者愿意用多少积分交换头寸；它不能知道月球、比赛或天气到底发生了什么。如果预言机把错误结果写入结算，价格即使事后反弹，也无法自动把已经领取的赔付追回。
+
+因此，一个严肃的系统会把“价格发现”和“事实报告”分成两个模块：前者处理观点和流动性，后者处理数据源、挑战和争议。模块边界越清楚，风险越容易被测试和解释。
+
+<Checkpoint
+  id="oracle-role"
+  question="预言机挑战窗口最重要的作用是什么？"
+  options={["让市场价格自动变成客观概率", "给其他参与者时间提交相反证据，并用担保金承担挑战成本", "让区块链直接读取现实世界"]}
+  correctIndex={1}
+  explanation="挑战窗口不会让链直接看见现实，而是为报告争议提供公开时间和经济激励。最终结果仍然依赖约定的数据源与仲裁规则。"
+/>
+
+## 用五个问题检查预言机设计
+
+完成实验后，试着解释：
+
+1. 数据源和报告者分别承担什么角色？
+2. 为什么报告提交后不能立刻触发赔付？
+3. 挑战者为什么需要锁定自己的担保？
+4. 没有人挑战时，错误报告为什么仍可能被最终化？
+5. 预测市场应该在什么时候读取最终结果？
+
+预言机是所有链上金融系统的“现实接口”：预测、借贷抵押率、稳定币储备、清算价格都会依赖它。理解它的边界，才算真正理解链上金融不是一组孤立的合约。
+
+<SourceList>
+
+- [Chainlink：预言机与去中心化数据](https://chain.link/education-hub/what-is-a-blockchain-oracle)
+- [UMA：乐观预言机与争议机制](https://docs.uma.xyz/protocol-overview/how-does-umas-optimistic-oracle-work)
+- [Ethereum.org：预言机](https://ethereum.org/developers/docs/oracles/)
+
+</SourceList>

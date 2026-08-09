@@ -1,0 +1,67 @@
+import { LessonLead, Concept, Think, MechanismDetails, Checkpoint, SourceList } from "@/platform/components/LessonPrimitives"
+import { MatchingEngineLab } from "@/modules/matching-engine/components/MatchingEngineLab"
+
+<LessonLead>
+撮合引擎不仅要找到对手方，还要阻止错误的状态转换。撤改单、自成交保护和冻结资产规则，决定一条看似普通的报价会变成真实成交、被取消，还是被风控拒绝。
+</LessonLead>
+
+## 改价不是编辑一行文字
+
+先把买单挂在 100 分，再把它改成 102 分。系统不会原地修改原订单，因为那会让一个新价格继承旧的时间优先级。正确的状态变化是：释放旧订单的冻结资产，结束旧订单，再用新序号提交一张新的订单。
+
+<MatchingEngineLab focus="risk" />
+
+<Concept title="订单生命周期要和资产生命周期对齐">
+<p>挂单时资产被冻结；部分成交时，已成交部分转成买方资产和卖方现金；撤单时只释放剩余数量。改价必须先释放旧冻结，再为新订单重新冻结，否则账户会出现“同一笔钱被锁两次”或可以重复使用的漏洞。</p>
+</Concept>
+
+## 自成交会制造虚假的市场信号
+
+如果同一个账户同时有买 100 和卖 99，简单的撮合循环会让账户“和自己成交”。这不会创造真正的风险转移，却会增加成交量、改变最近成交价，并制造虚假的需求。实验室采用取消新进入订单剩余的自成交保护：历史订单不被抹掉，冻结资产被释放，事件日志明确写出原因。
+
+<Think>
+<p>为什么自成交保护通常取消“新订单”而不是随机取消一边？如果系统选择保留旧订单，它至少保留了价格时间队列的可预测性；不同平台也可能采用取消新单、取消旧单或双边取消等模式。</p>
+</Think>
+
+<MechanismDetails>
+
+```text
+replace(old, newPrice, newQuantity):
+  release(old.remaining)
+  close(old)
+  new = enqueue(newPrice, newQuantity, nextSequence)
+  match(new)
+
+if buyer.trader == seller.trader:
+  cancel(new.remaining)
+  emit("SELF_TRADE_PREVENTED")
+```
+
+风控不是撮合之后的装饰，而是状态机的一部分。每个拒绝、取消和成交都应该留下可重放的事件，才能让审计者判断余额、冻结资产和订单簿是否仍然一致。
+
+</MechanismDetails>
+
+<Checkpoint
+  id="engine-risk-controls"
+  question="为什么撤改单后，新价格不能继续沿用旧订单的时间优先级？"
+  options={["因为价格一改变，订单就应当以新的时间序号重新进入队列", "因为撮合引擎不允许任何订单改变价格", "因为撤单会把已经成交的数量也恢复回来"]}
+  correctIndex={0}
+  explanation="允许改价继承旧序号会让参与者先排队、再不断改成更有利的价格，破坏同价位的公平排序。撤改单应结束旧订单并创建新的排队记录。"
+/>
+
+## 读懂一条风控事件
+
+1. 这是订单被拒绝、被取消，还是已经成交？
+2. 哪一部分资产仍被冻结，哪一部分已经结算？
+3. 新订单的序号是否真的晚于旧订单？
+4. 事件重放后，订单簿是否仍然无交叉、总资产是否守恒？
+
+这套检查会贯穿交易所、链上订单簿和清算引擎。安全不是某个按钮，而是每一步状态转换都有明确边界。
+
+<SourceList>
+
+- [Coinbase Exchange：自成交防护](https://docs.cdp.coinbase.com/exchange/concepts/orders)
+- [CME Group：订单生命周期](https://www.cmegroup.com/education/courses/introduction-to-futures/understanding-order-types.html)
+- [FIX Trading Community：订单状态](https://www.fixtrading.org/standards/)
+
+</SourceList>

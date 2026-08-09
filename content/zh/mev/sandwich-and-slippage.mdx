@@ -1,0 +1,62 @@
+import { LessonLead, Concept, Think, MechanismDetails, Checkpoint, SourceList } from "@/platform/components/LessonPrimitives"
+import { MEVLab } from "@/modules/mev/components/MEVLab"
+
+<LessonLead>
+夹子交易不是“池子被黑了”这么简单。它利用公开用户意图和 AMM 的曲线：搜索者先买入改变储备，用户在更差的状态里成交，搜索者再卖出，把一部分价格冲击变成自己的收益。
+</LessonLead>
+
+## 把三笔交易放在同一条排序里
+
+在普通公开场景中，区块可能只执行用户交换；在夹子场景中，搜索者提出：
+
+1. 前置买入：先消耗一部分 TOKEN 深度；
+2. 用户交换：在新的储备上执行；
+3. 后置卖出：把前置买到的 TOKEN 卖回池子。
+
+<MEVLab focus="sandwich" />
+
+观察用户的“预估输出”和“实际输出”。如果最小得到数量设得太宽，用户会接受更差的成交；如果保护线设得足够紧，用户交易会回滚，搜索者不能把这笔失败当作已成交。
+
+<Concept title="滑点保护不是价格保证，而是失败条件">
+<p>最小得到数量只表达“低于这个结果就不要执行”。它不能保证你一定成交，也不能阻止池子在其他交易中移动；它把不可接受的状态明确变成回滚。</p>
+</Concept>
+
+<Think>
+<p>如果严格保护让交易回滚，用户支付了什么？通常是一次失败尝试的网络成本，而不是把 TOKEN 以更差价格交给搜索者。把“失败成本”和“价值提取”分开。</p>
+</Think>
+
+<MechanismDetails>
+
+```text
+front = swap(searcher, X → Y)
+victim = quote(pool_after_front, X → Y)
+if victim.amountOut < victim.minOut:
+    revert(victim)
+else:
+    execute(victim)
+back = swap(searcher, Y → X)
+```
+
+真实协议还要处理原子性、gas 竞价、私有 bundle、路由器最小输出和多池路径。实验室只保留能看见资产流向的最小状态机。
+
+</MechanismDetails>
+
+<Checkpoint
+  id="mev-sandwich-slippage"
+  question="最小得到数量在夹子交易中真正保护了什么？"
+  options={["它保证交易一定成交并且价格不会变化", "它规定低于可接受输出时交易必须回滚，避免用户默默接受更差结果", "它把搜索者的利润自动转给用户"]}
+  correctIndex={1}
+  explanation="保护线是一个执行条件，不是固定价格。排序改变报价后，如果输出跌破边界，交易应回滚；它不会让交易必然成功，也不会自动分配利润。"
+/>
+
+## 读懂一笔提取
+
+夹子提取应当放在同一张账上：用户少得到的 TOKEN、搜索者的积分变化、池子收取的手续费，以及提议者可能拿到的排序小费。只有这样，才能避免把每一个负的价格冲击都误读成同一种攻击。
+
+<SourceList>
+
+- [Uniswap：滑点与最小输出](https://docs.uniswap.org/contracts/v2/concepts/protocol-overview/trades)
+- [Flashbots：MEV 与 sandwich](https://docs.flashbots.net/flashbots-auction/searchers/understanding-bundles)
+- [Ethereum.org：交易费用与 gas](https://ethereum.org/en/developers/docs/gas/)
+
+</SourceList>

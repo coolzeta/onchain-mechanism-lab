@@ -1,0 +1,70 @@
+import { LessonLead, Concept, Think, MechanismDetails, Checkpoint, SourceList } from "@/platform/components/LessonPrimitives"
+import { AMMLab } from "@/modules/amm/components/AMMLab"
+
+<LessonLead>
+成为 LP 不是把资产存进一个高息账户。你把两种资产交给池子，换来一份对未来库存的比例所有权；交易费可能增加这份库存，但交易方向也会改变你最后拿回的资产组合。
+</LessonLead>
+
+## LP 份额到底代表什么
+
+池子起初由一份基础流动性组成。你按接近当前比例存入积分和 TOKEN，系统铸造一部分 LP 份额。份额不是某几枚固定的 TOKEN，而是“池子总储备的百分之几”。
+
+<AMMLab focus="lp" />
+
+先存入建议比例，再执行一笔用积分买 TOKEN 的交换。此时池子有更多积分、更少 TOKEN；你的份额比例没有变，但它对应的库存已经变了。
+
+<Concept title="手续费留在池子里，LP 收到的是更大的共同库存">
+<p>交易费没有直接打进某个 LP 的钱包，而是留在储备里。所有份额按比例拥有这部分增长，所以手续费收入会和库存风险一起出现。</p>
+</Concept>
+
+## 用两张账看 LP，而不是只看一张收益率
+
+实验室会同时显示两种估值：
+
+1. **池内持仓价值**：按你当前 LP 份额能取回的两种储备，并用当前现货价把 TOKEN 折算成积分。
+2. **持有基准价值**：假设你没有加入池子，只把最初存入的两种资产放在钱包里，再用同一个当前价格估值。
+
+两者的差异包含了手续费、价格曲线和库存比例变化。它不是完整的会计报表，却足以让你看到“赚到手续费”并不自动等于“比单纯持有更好”。
+
+<Think>
+<p>如果交易者持续买走 TOKEN，LP 取回的组合会偏向积分。假设外部市场随后把 TOKEN 估得更贵，LP 和单纯持有者谁手里的 TOKEN 更多？这正是库存风险的入口。</p>
+</Think>
+
+## 存入比例、铸造份额和舍入
+
+最小实现通常按两种资产各自能铸造的份额取较小值：
+
+<MechanismDetails>
+
+```text
+sharesFromX = amountX × totalShares / reserveX
+sharesFromY = amountY × totalShares / reserveY
+shares = min(floor(sharesFromX), floor(sharesFromY))
+
+withdrawX = reserveX × shares / totalShares
+withdrawY = reserveY × shares / totalShares
+```
+
+真实合约还要处理初始流动性锁定、捐赠资产、精度舍入和最小存入量。每一个取整方向都可能影响长期的资产守恒和份额公平。
+
+</MechanismDetails>
+
+<Checkpoint
+  id="amm-lp-risk"
+  question="为什么 LP 不能把一份 LP 份额理解成固定的 12,000 积分和 100 TOKEN？"
+  options={["因为份额代表池子储备的比例，交易会改变池子里两种资产的数量", "因为 LP 份额只是一串没有价值的编号", "因为手续费会把所有 TOKEN 自动换成积分"]}
+  correctIndex={0}
+  explanation="LP 份额是对共同库存的比例所有权。储备移动后，同样的份额对应的积分和 TOKEN 数量也会移动。"
+/>
+
+## 先把风险说清楚，再谈收益
+
+LP 的正确问题不是“手续费 APR 有多高”，而是：交易量带来的费用，是否足以补偿库存比例改变、价格偏离、合约漏洞和退出时的执行成本。把资产交给池子之前，先能读懂这两张账，才有资格讨论收益。
+
+<SourceList>
+
+- [Uniswap v2：流动性提供者](https://docs.uniswap.org/contracts/v2/concepts/protocol-overview/fees)
+- [Uniswap v2：流动性](https://docs.uniswap.org/contracts/v2/concepts/protocol-overview/liquidity-mints)
+- [Uniswap v2：价格影响与储备](https://docs.uniswap.org/contracts/v2/concepts/protocol-overview/how-uniswap-works)
+
+</SourceList>

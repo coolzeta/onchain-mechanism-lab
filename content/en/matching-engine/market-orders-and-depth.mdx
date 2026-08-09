@@ -1,0 +1,58 @@
+import { LessonLead, Concept, Think, MechanismDetails, Checkpoint, SourceList } from "@/platform/components/LessonPrimitives"
+import { MatchingEngineLab } from "@/modules/matching-engine/components/MatchingEngineLab"
+
+<LessonLead>
+A market order puts “fill now” first and gives price control to the book. It looks simpler than a limit order but depends more on depth: one request can fill across several levels, so its average price may differ sharply from the first ask you see.
+</LessonLead>
+
+## No specified price does not mean no price
+
+The lab’s market order promises only an attempt at immediate execution. It consumes available asks from the best ask upward until the quantity is filled or the book runs out. Every fill still has an explicit price; those prices come from resting sell orders.
+
+<MatchingEngineLab locale="en" focus="market" />
+
+<Concept title="Limit orders protect price; market orders prioritize time">
+<p>BUY limit 104 means “pay no more than 104.” A market buy means “use the prices currently offered.” Production systems often add price bands, maximum notional, or slippage limits so a thin book cannot push an order to an unexpected level.</p>
+</Concept>
+
+## One order can cross multiple levels
+
+Suppose the ask book has 5 LAB at 102 and another 5 LAB at 105. A market buy for 8 first takes 5 at 102, then 3 at 105. It is not “8 at 102”; it is two fills. Average execution is total notional divided by total filled quantity, so it is above 102 because depth—not a random engine decision—created the difference.
+
+<Think>
+<p>Move the depth probe from 5 to 8. Why do the first five avoid impact while the next three cross to 105? If the best ask had only one unit, would a small total order still have a stable average price?</p>
+</Think>
+
+## IOC remainder does not quietly join the queue
+
+The teaching implementation uses IOC (Immediate-Or-Cancel): the immediately fillable portion executes, and the rest cancels. “I want to trade now” is kept distinct from “I am willing to wait in the book.”
+
+<MechanismDetails>
+
+```text
+for ask in asks sorted by price, time:
+  fill = min(order.remaining, ask.remaining)
+  settle(at=ask.price, quantity=fill)
+  if order.remaining == 0: break
+cancel(order.remaining)
+```
+
+Real systems also check balances, price protection, risk limits, and matching batches. The lab reports requested, filled, remaining, and average execution so you can inspect state rather than animation.
+
+</MechanismDetails>
+
+<Checkpoint
+  id="engine-market-depth"
+  question="Why is the average execution price above the best ask of 102 after a market buy for 8 LAB?"
+  options={["The market order adds a hidden fee", "There are only 5 LAB at 102, so the rest crosses to a higher price level", "The engine randomly chooses fills"]}
+  correctIndex={1}
+  explanation="The order consumes asks level by level: five LAB at 102 and three at 105. Total notional divided by eight is therefore above the best ask."
+/>
+
+<SourceList>
+
+- [Nasdaq: Market order](https://www.nasdaq.com/glossary/m/market-order)
+- [Coinbase Exchange: Orders](https://docs.cdp.coinbase.com/exchange/concepts/orders)
+- [FIX Trading Community: Execution types](https://www.fixtrading.org/standards/)
+
+</SourceList>

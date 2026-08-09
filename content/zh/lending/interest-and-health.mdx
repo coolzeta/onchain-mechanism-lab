@@ -1,0 +1,66 @@
+import { LessonLead, Concept, Think, MechanismDetails, Checkpoint, SourceList } from "@/platform/components/LessonPrimitives"
+import { LendingLab } from "@/modules/lending/components/LendingLab"
+
+<LessonLead>
+借款不是一次性的按钮。利息会随着时间累积到债务上，健康度则把“抵押品还能覆盖多少风险”压缩成一个可以持续监控的指标。账户即使没有再次操作，也可能逐渐靠近清算线。
+</LessonLead>
+
+## 健康度不是收益率
+
+本实验用一个简单的比值：
+
+> `健康度 = 抵押品价值 × 清算阈值 ÷ 当前债务`
+
+健康度 1.00 是边界。高于 1.00 代表按当前预言机价格仍有缓冲；低于 1.00 则意味着允许清算。它不是“这个账户还能赚多少钱”，也不是资产价格的预测。
+
+<LendingLab focus="health" />
+
+<Concept title="利息把风险变成一条时间序列">
+<p>利息不是界面上的静态费用。它会增加债务、降低健康度、减少还可以继续借出的空间。监控系统必须记录计息时间和计算规则，不能只看最初借款金额。</p>
+</Concept>
+
+## 还款为什么能恢复安全空间
+
+还款会同时减少用户现金和协议债务。债务降低后，健康度上升，账户也可能重新获得取出部分抵押品的资格。取出顺序必须先检查取出后的状态，不能先转走资产再补做风控。
+
+<Think>
+<p>如果一个账户健康度是 1.08，推进两个计息周期后变成 0.99，最直接的修复是什么？只补充“账户看起来更有信心”的文字有用吗？</p>
+</Think>
+
+<MechanismDetails>
+
+```text
+accrueInterest:
+  interest = debt * ratePerPeriod
+  debt += interest
+
+repay(amount):
+  userCash -= amount
+  poolLiquidity += amount
+  debt -= amount
+
+healthFactor = collateralValue * liquidationThreshold / debt
+```
+
+健康度是一个由状态推导出的读数；真正需要被保护的是债务、抵押品和资金流之间的不变量。
+
+</MechanismDetails>
+
+<Checkpoint
+  id="lending-health-factor"
+  question="价格不变但利息不断累积，为什么健康度会下降？"
+  options={["因为预言机自动把价格改低了", "因为债务变大，而健康度的分母是债务", "因为抵押品会在每个区块自动减少"]}
+  correctIndex={1}
+  explanation="在抵押品价值不变时，债务增加会直接压低健康度。还款减少债务，才会恢复缓冲。"
+/>
+
+## 本章小结
+
+你已经看到风险不只来自突然的价格崩跌，也来自时间和债务本身。下一章把价格推过清算线，观察清算人如何接管头寸。
+
+<SourceList>
+
+- [Aave：Health Factor](https://aave.com/help/borrowing/liquidations)
+- [MakerDAO：稳定费与债务](https://makerdao.com/en/whitepaper/)
+
+</SourceList>

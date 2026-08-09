@@ -1,0 +1,57 @@
+import { LessonLead, Concept, Think, MechanismDetails, Checkpoint, SourceList } from "@/platform/components/LessonPrimitives"
+import { TokenLaunchLab } from "@/modules/token-launch/components/TokenLaunchLab"
+
+<LessonLead>
+The hard part of a supply rule is not only the maximum; it is who can approve a change. Move mint authority from one creator to a 2/3 multisig, try the wrong actor, and then inspect why revocation is a terminal promise.
+</LessonLead>
+
+## Authority is an executable boundary
+
+An address label can say “multisig,” but only an authorization check can enforce it. The lab distinguishes three states: creator single-signature, 2/3 multisig, and revoked. Each state accepts a different mint actor—or no actor at all.
+
+<TokenLaunchLab locale="en" focus="governance" />
+
+<Concept title="Multisig reduces one-key risk, not economic judgment">
+<p>A multisig changes how many approvals are needed; it does not tell approvers whether an issuance is wise, fair, or non-dilutive. Governance security and economic governance are separate questions.</p>
+</Concept>
+
+<Think>
+<p>Why is revoking authority more irreversible than transferring it to a new hot wallet? If multisig members need to change, what process replaces a terminal commitment without silently rewriting the old one?</p>
+</Think>
+
+<MechanismDetails>
+
+```text
+require(authority == msg.senderRole)
+require(totalSupply + amount <= maxSupply)
+
+transferAuthority(multisig)
+revokeAuthority() // terminal state
+```
+
+Production systems add timelocks, proposal hashes, execution delays, and upgrade administrators. This lab compresses governance into a replayable authority transition so you can separate “who may execute” from “whether the payload is sensible.”
+
+</MechanismDetails>
+
+<Checkpoint
+  id="token-authority-handoff"
+  question="After mint authority moves to a 2/3 multisig, what should happen when the creator submits mint alone?"
+  options={["It succeeds because the maximum supply is unchanged", "It is rejected because the current approver is no longer the creator single-signature", "Authority automatically moves back to the creator"]}
+  correctIndex={1}
+  explanation="Maximum supply constrains quantity; authority state constrains the actor. After handoff, the creator's solo execution no longer satisfies the permission boundary."
+/>
+
+## Four governance questions
+
+- Are maximum, current total, and liquid supply recorded separately?
+- Do mint, transfer, claim, and burn leave distinct events?
+- Can handoff and revocation be deterministically replayed?
+- Does the multisig reduce key risk, or are you mistakenly treating it as an economic decision-maker?
+
+<SourceList>
+
+- [OpenZeppelin: AccessControl](https://docs.openzeppelin.com/contracts/5.x/access-control)
+- [OpenZeppelin: TimelockController](https://docs.openzeppelin.com/contracts/5.x/api/governance#TimelockController)
+- [Safe: What is a Safe multisig?](https://help.safe.global/en/articles/40827-what-is-a-safe)
+
+</SourceList>

@@ -1,0 +1,65 @@
+import { LessonLead, Concept, Think, MechanismDetails, Checkpoint, SourceList } from "@/platform/components/LessonPrimitives"
+import { TokenLaunchLab } from "@/modules/token-launch/components/TokenLaunchLab"
+
+<LessonLead>
+Token economics is not only “how many units exist.” After each action, ask whose share grew, whose share fell, and whether the change came from ownership transfer, supply expansion, or supply destruction.
+</LessonLead>
+
+## Three actions, three ledger outcomes
+
+<TokenLaunchLab locale="en" focus="distribution" />
+
+- **Transfer**: total supply stays the same; ownership moves between holders.
+- **Mint**: a balance and total supply rise together; existing holders can be diluted.
+- **Burn**: a holder balance and total supply fall together; remaining units may gain relative share.
+
+All three can look like “a number changed” in a UI, but their risks for other holders are different.
+
+<Concept title="Concentration needs both liquid and locked views">
+<p>A creator can hold only 10% of liquid units while controlling 40% of the full allocation, including vesting. The first number affects current tradable supply; the second affects future voting power, unlock pressure, and possible selling. The lab shows both.</p>
+</Concept>
+
+## Dilution is not the same as a price drop
+
+If the treasury transfers 50,000 LAB to a learner, ownership distribution changes but the total supply ratio does not. If the creator mints 50,000 LAB, old units become a smaller fraction of total supply even before market price moves: dilution has already happened.
+
+Burn is the opposite direction: it reduces total supply, but does not automatically make every holder wealthier or more powerful. Who burns, and which balance is removed, still matters.
+
+<Think>
+<p>When a treasury distribution increases a user's balance, did the creator's percentage fall because of dilution or because ownership moved? Now compare it with a mint of the same amount.</p>
+</Think>
+
+<MechanismDetails>
+
+```text
+transfer(A, B, amount):
+  A -= amount; B += amount; totalSupply unchanged
+mint(T, amount):
+  T += amount; totalSupply += amount
+burn(A, amount):
+  A -= amount; totalSupply -= amount
+```
+
+Market price, voting weight, and fully diluted allocation can each answer a different question. Never use one percentage as a substitute for all three.
+
+</MechanismDetails>
+
+<Checkpoint
+  id="token-dilution-distribution"
+  question="What is the key difference between a 50,000 LAB transfer and a 50,000 LAB mint?"
+  options={["Transfer changes holder distribution; mint expands total supply and can dilute existing holders", "They are identical because a balance changes in both cases", "Transfer expands supply while mint only moves ownership"]}
+  correctIndex={0}
+  explanation="A transfer moves existing units. Mint creates new units and increases total supply, so existing units can represent a smaller share."
+/>
+
+## A quick concentration audit
+
+Compare the creator's liquid share, the community's liquid share, and the largest full allocation. Then ask which future unlocks could change the answer.
+
+<SourceList>
+
+- [OpenZeppelin: ERC-20 supply mechanics](https://docs.openzeppelin.com/contracts/5.x/erc20)
+- [Ethereum.org: ERC-20 standard](https://ethereum.org/developers/docs/standards/tokens/erc-20/)
+- [SEC: Crypto asset disclosure risks](https://www.sec.gov/spotlight/cybersecurity-enforcement-actions)
+
+</SourceList>

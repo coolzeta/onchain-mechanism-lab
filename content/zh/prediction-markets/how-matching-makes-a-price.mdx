@@ -1,0 +1,71 @@
+import { LessonLead, Concept, Think, MechanismDetails, Checkpoint, SourceList } from "@/platform/components/LessonPrimitives"
+import { MatchingLab } from "@/modules/prediction-markets/components/MatchingLab"
+
+<LessonLead>
+订单簿只是一组尚未成交的承诺。撮合引擎不断寻找“买方愿意支付的价格不低于卖方愿意接受的价格”的组合，并用一套公开优先级把它们变成交易。
+</LessonLead>
+
+## 先看买一、卖一和价差
+
+买单按价格从高到低排列，最高的一张叫**买一**；卖单按价格从低到高排列，最低的一张叫**卖一**。两者之间的距离叫价差。
+
+当买一是 58、卖一是 66 时，没有任何两个人同时满意，因此不会成交。新的买单愿意支付 70 时，它穿过了卖一 66，撮合条件成立。
+
+<MatchingLab />
+
+## 为什么成交价使用更早的订单
+
+假设 Bob 的卖单 `ASK 65` 已经在订单簿等待。Carol 随后提交 `BID 70`。65 到 70 之间有多个价格都能让双方接受，但系统需要一个确定规则。
+
+这里采用常见的“静止订单价格”：Bob 先承诺 65，Carol 是主动穿过价差的人，所以成交价是 65。Carol 比自己的上限少付 5，Bob 得到自己公开接受的价格。
+
+<Concept title="限价是边界，不是对成交价的命令">
+<p>BUY YES @ 70 的含义是“70 或更便宜都可以”，不是“必须在 70 成交”。订单可能以更有利的价格成交，也可能完全不成交。</p>
+</Concept>
+
+## 同一个价格下，时间决定顺序
+
+如果 Alice 和 Carol 都在 65 买 YES，而 Bob 只能提供 2 份 NO，那么先进入订单簿的人先成交。这就是**价格优先、时间优先**：
+
+1. 买方价格更高、卖方价格更低的订单优先；
+2. 价格相同，序号更小的订单优先；
+3. 数量不足时先部分成交，剩余数量继续排队。
+
+这些规则不仅关系公平，也让系统可以被确定性重放：给定完全相同的订单序列，任何验证者都应该得到完全相同的成交结果。
+
+<Think>
+<p>一张 BUY YES @70 ×10 遇到 ASK 64 ×3 和 ASK 68 ×4 后，还剩多少数量？成交会产生几个价格？</p>
+</Think>
+
+<MechanismDetails>
+
+```text
+while bestBid.price >= bestAsk.price:
+  maker = earlier(bestBid, bestAsk)
+  quantity = min(bestBid.remaining, bestAsk.remaining)
+  trade(price = maker.price, quantity)
+  lockCollateral(quantity * 100)
+```
+
+每次撮合后都要再次检查订单簿，直到买一严格低于卖一。
+
+</MechanismDetails>
+
+<Checkpoint
+  id="price-time-priority"
+  question="卖单 ASK 65 先进入订单簿，随后到达 BUY YES @70。成交价通常是多少？"
+  options={["70，因为买方愿意付到 70", "67.5，永远取双方中点", "65，采用更早的静止订单价格"]}
+  correctIndex={2}
+  explanation="限价定义可接受边界；主动订单穿过价差时，通常与静止订单的公开价格成交。"
+/>
+
+## 本章小结
+
+市场现在有了成交记录和“最近成交价”。下一章要防止一个常见误读：最近价格 70，并不意味着系统发现了一个客观、永恒的 70% 概率。
+
+<SourceList>
+
+- [Polymarket：下单与成交](https://docs.polymarket.com/trading/orders/create)
+- [Nasdaq：Price/Time Priority](https://www.nasdaqtrader.com/content/ProductsServices/Trading/ClosingCrossfaq.pdf)
+
+</SourceList>

@@ -1,0 +1,71 @@
+import { LessonLead, Concept, Think, MechanismDetails, Checkpoint, SourceList } from "@/platform/components/LessonPrimitives"
+import { AMMLab } from "@/modules/amm/components/AMMLab"
+
+<LessonLead>
+An order book needs another person to stand on the other side. An AMM rewrites that problem: put two assets in a public pool, then let the reserve ratio quote the next swap.
+</LessonLead>
+
+## Forget “finding a counterparty”
+
+An AMM has no best bid, no best ask, and no Alice who must be online. The pool owns both reserves and anyone can swap against the same rule. In this lab they are **credits** and **TOKEN**: 120,000 credits and 1,000 TOKEN imply a spot price near 120 credits per TOKEN.
+
+<AMMLab locale="en" />
+
+## x · y = k is a state constraint
+
+For a constant-product pool, the product of the reserves describes the current state:
+
+```text
+x = 120,000 credits
+y = 1,000 TOKEN
+k = x · y = 120,000,000
+```
+
+When you buy TOKEN with credits, the pool receives X and sends out Y. The new reserves must still satisfy the constraint, so output cannot simply use the old price. The more you buy, the scarcer TOKEN becomes and the next unit costs more.
+
+<Concept title="Spot price is a tangent; execution price is the average along the curve">
+<p>The displayed 120 is an instantaneous reserve ratio. A sized trade moves the reserves, so its first and last units face different prices. That difference is part of price impact.</p>
+</Concept>
+
+## Why fees make k grow
+
+With a 0.30% fee, a 12,000-credit input leaves 36 credits in the pool and only 11,964 credits enter the curve calculation. The trader receives less output, while the fee remains in reserves and slowly grows x · y for LPs.
+
+<Think>
+<p>If a large order pushes TOKEN reserves from 1,000 to 600, should the next TOKEN be cheaper or more expensive? Read the reserve ratio before reading the formula.</p>
+</Think>
+
+<MechanismDetails>
+
+```text
+fee = amountIn × 30 / 10,000
+usableIn = amountIn - fee
+amountOut = reserveOut × usableIn / (reserveIn + usableIn)
+
+reserveIn  += amountIn
+reserveOut -= amountOut
+```
+
+The simulator uses integer units and floors every division. Production contracts also need rounding policies, minimum output, extreme-reserve checks, and reentrancy protection.
+
+</MechanismDetails>
+
+<Checkpoint
+  id="amm-constant-product"
+  question="Why does a large swap usually execute worse than the spot price?"
+  options={["The pool randomly punishes large traders", "The swap moves the reserve ratio along the curve, making later output scarcer", "Because an AMM does not charge fees"]}
+  correctIndex={1}
+  explanation="Spot price is only the pre-trade instantaneous ratio. A large order moves reserves and pays a higher marginal price; fees reduce output further."
+/>
+
+## Read an AMM as four questions
+
+After this experiment, ask: how much X and Y are in the pool, how far average execution moved from spot, who receives the fee, and what an LP would withdraw after the reserves move. The formula is a compressed rule; the mechanism is the asset flow between pool, trader, and LP.
+
+<SourceList>
+
+- [Uniswap v2: How Uniswap works](https://docs.uniswap.org/contracts/v2/concepts/protocol-overview/how-uniswap-works)
+- [Uniswap v2: Fees](https://docs.uniswap.org/contracts/v2/concepts/protocol-overview/fees)
+- [Ethereum.org: Decentralized exchanges](https://ethereum.org/defi/#decentralized-exchanges-dex)
+
+</SourceList>

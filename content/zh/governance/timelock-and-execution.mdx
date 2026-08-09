@@ -1,0 +1,49 @@
+import { LessonLead, Concept, Think, MechanismDetails, Checkpoint, SourceList } from "@/platform/components/LessonPrimitives"
+import { GovernanceLab } from "@/modules/governance/components/GovernanceLab"
+
+<LessonLead>
+通过不是终点。时间锁把“社区同意”和“协议改变”之间拉出一段公开倒计时，让成员、监控器和集成方有机会发现错误并做出反应。
+</LessonLead>
+
+## 四个状态，四种权限
+
+提案通过后先进入 queued；等待两天变成 ready；只有 ready 才能 execute。每个状态都让不同的动作变得合法或非法，而不是给按钮换一套颜色。
+
+<GovernanceLab focus="timelock" />
+
+先尝试在投票结束后直接执行，观察错误反馈。然后排队、推进时间，再执行手续费变更。时间轴和事件日志会显示批准、等待和写入状态的顺序。
+
+<Concept title="时间锁是可观察的延迟，不是魔法保险">
+<p>时间锁降低了“突然改变”的风险，但它不会判断提案是否善意。延迟期间仍需要监控、取消者、升级权限和社区沟通；如果执行器本身被攻破，时间锁也可能只是倒计时。</p>
+</Concept>
+
+<Think>
+<p>一个提案已经 queued，但执行内容后来被发现有错误。你希望谁能取消？取消者拥有多大权限才不会成为新的单点风险？</p>
+</Think>
+
+<MechanismDetails>
+
+```text
+succeeded → queue(operation, salt, eta)
+eta reached → ready
+executor calls target only when ready
+```
+
+真实系统会把操作哈希、时间戳、前置和后置调用一起纳入权限检查。模拟器用 `queuedAt + timelockDelay` 表示同一条可验证边界，并记录每个事件以支持完整重放。
+
+</MechanismDetails>
+
+<Checkpoint
+  id="governance-timelock"
+  question="时间锁最直接提供了什么？"
+  options={["在批准和执行之间留下可观察、可取消的反应窗口", "保证所有提案的参数永远正确", "让任何地址都能绕过投票直接修改协议"]}
+  correctIndex={0}
+  explanation="时间锁延迟执行并暴露操作；它改善响应时间，但不能代替提案审查和安全权限设计。"
+/>
+
+<SourceList>
+
+- [OpenZeppelin TimelockController](https://docs.openzeppelin.com/contracts/5.x/api/governance#TimelockController)
+- [Ethereum.org：DAO 治理与执行](https://ethereum.org/en/dao/)
+
+</SourceList>

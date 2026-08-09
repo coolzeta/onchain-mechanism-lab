@@ -1,0 +1,71 @@
+import { LessonLead, Concept, Think, MechanismDetails, Checkpoint, SourceList } from "@/platform/components/LessonPrimitives"
+import { LedgerLab } from "@/modules/ledger/components/LedgerLab"
+
+<LessonLead>
+广播之后，交易不会立刻改变余额。它先进入节点的交易池，等待一个区块生产者决定是否、何时以及按什么顺序执行。本章把交易池当成一间公开的候车室。
+</LessonLead>
+
+## Pending 是“已签名”，不是“已生效”
+
+一笔 Pending 交易已经通过钱包侧的签名，但还没有成为所有节点都接受的状态转换。它可以因为余额不足、Nonce 不对、签名失效或竞争同一个序号而被拒绝。
+
+<LedgerLab focus="pool" />
+
+观察实验室里的交易队列：广播后，余额和 Nonce 仍然保持不变；只有点击打包，节点才会逐笔执行交易。
+
+<Concept title="交易池不是一条先进先出的单队列">
+<p>真实节点会按账户 Nonce、费用、有效性和本地策略管理交易。为了让原理清楚，本实验室只保留一个可观察的 Pending 队列和确定性打包顺序。</p>
+</Concept>
+
+## 同一个 Nonce 可以替换，但不能同时成功两次
+
+如果你发现一笔 Pending 交易的金额或目标不合适，钱包通常会用相同 Nonce 广播一个新版本。节点在执行时只能让这个序号对应一次成功状态转换；旧版本被替换后不会额外扣款。
+
+<Think>
+<p>先广播一笔 120 积分的交易，再用相同 Nonce 替换成 260。为什么签名必须重新生成？因为签名授权的是金额、收款方和 Nonce 的组合，替换任何字段都需要新的授权。</p>
+</Think>
+
+<MechanismDetails>
+
+```text
+replace(pending, nextAmount):
+  require pending.status == PENDING
+  require nextAmount > 0
+  pending.amount = nextAmount
+  pending.signature = sign(pending.fields)
+
+mine(queue):
+  for tx in queue:
+    if tx.nonce == account[tx.from].nonce and verify(tx):
+      apply(tx)
+    else:
+      reject(tx)
+```
+
+真实链还会用更高费用激励节点接受替换版本。这里先把核心约束显式化：同一个 Nonce 是账户状态机的一个槽位。
+
+</MechanismDetails>
+
+<Checkpoint
+  id="transaction-pool"
+  question="同一个 Nonce 的替换交易，为什么不会让账户扣款两次？"
+  options={["因为 Pending 交易从来不会被打包", "因为一个 Nonce 只能成功执行一次，节点按最终有效版本应用状态", "因为替换交易不需要签名"]}
+  correctIndex={1}
+  explanation="交易池可以暂存多个版本，但状态机只接受与当前 Nonce 匹配的一次成功转换。替换版本还必须重新签名。"
+/>
+
+## 从交易池继续问三个问题
+
+1. 交易在 Pending 时，哪些状态还没有改变？
+2. 为什么未来 Nonce 不能绕过当前 Nonce？
+3. 替换交易和篡改交易的区别是什么？
+
+这些问题会在撮合引擎、AMM 和借贷模块里反复出现：用户动作先进入队列，只有经过规则验证和顺序执行，才会影响共享状态。
+
+<SourceList>
+
+- [Ethereum.org：交易生命周期](https://ethereum.org/developers/docs/transactions/)
+- [Ethereum.org：交易池](https://ethereum.org/developers/docs/transactions/#transaction-lifecycle)
+- [Ethereum Yellow Paper：状态转换](https://ethereum.github.io/yellowpaper/paper.pdf)
+
+</SourceList>

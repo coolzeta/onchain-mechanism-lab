@@ -1,0 +1,71 @@
+import { LessonLead, Concept, Think, MechanismDetails, Checkpoint, SourceList } from "@/platform/components/LessonPrimitives"
+import { CollateralLab } from "@/modules/prediction-markets/components/CollateralLab"
+
+<LessonLead>
+YES and NO are not chips created from nothing. A simple design locks 100 credits and mints one YES share and one NO share. Whichever outcome wins can then claim exactly 100.
+</LessonLead>
+
+## Split one future into two receipts
+
+Deposit 100 credits into the market contract. It locks the credits and gives you two outcome shares:
+
+- **YES** pays 100 if the event happens and 0 otherwise.
+- **NO** pays 100 if the event does not happen and 0 otherwise.
+
+Together, the pair covers every binary outcome. Before resolution, a YES and NO share can also be merged to recover the original 100 credits.
+
+<CollateralLab locale="en" />
+
+<Concept title="YES + NO share one collateral anchor">
+<p>The number 100 is not a magical price. Anyone can mint a pair for 100 and merge a complete pair back into 100. Those two operations create an arbitrage boundary.</p>
+</Concept>
+
+## Why not find the loser after the result?
+
+If Bob only promises to pay later, he could leave, become insolvent, or refuse. A market for strangers cannot make payout depend on future creditworthiness.
+
+Pre-funding turns credit risk into a state that can be checked now: every pair issued needs a matching 100 credits in the settlement pool. Anyone can verify the invariant.
+
+<Think>
+<p>If 37 pairs were issued but only 3,200 credits were locked, what is the worst-case gap? Who would bear it?</p>
+</Think>
+
+## Shares exist before prices do
+
+A complete pair can redeem 100 in total, but that does not force YES to trade at 50 and NO at 50. Alice may bid 70 while Bob only bids 35. Price appears when different views arrive with real budgets.
+
+<MechanismDetails>
+
+```text
+split(100 credits):
+  collateral += 100
+  mint(YES, 1)
+  mint(NO, 1)
+
+resolve(YES):
+  redeem(YES) -> 100
+  redeem(NO)  -> 0
+```
+
+Core invariant: `locked collateral >= unsettled winning shares * 100`.
+
+</MechanismDetails>
+
+<Checkpoint
+  id="full-collateral"
+  question="Why does each YES/NO pair require 100 credits of collateral?"
+  options={["To keep the market price at 50", "So whichever outcome wins, the winning share can redeem 100", "To pay the matching engine fee"]}
+  correctIndex={1}
+  explanation="Collateral funds future payout. It is independent of the current market price."
+/>
+
+## State passed to the next lesson
+
+The system now has fully collateralized binary shares. Next Alice, Bob, and Carol translate their judgments into orders that can actually meet.
+
+<SourceList>
+
+- [Polymarket: how positions split, merge, and redeem](https://docs.polymarket.com/trading/positions/how-positions-work)
+- [Conditional Tokens Framework](https://github.com/gnosis/conditional-tokens-contracts)
+
+</SourceList>

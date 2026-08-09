@@ -1,0 +1,62 @@
+import { LessonLead, Concept, Think, MechanismDetails, Checkpoint, SourceList } from "@/platform/components/LessonPrimitives"
+import { LedgerLab } from "@/modules/ledger/components/LedgerLab"
+
+<LessonLead>
+After broadcast, a transaction does not immediately change a balance. It enters a node's transaction pool while a block producer decides whether, when, and in what order to execute it. Treat this pool as a public waiting room.
+</LessonLead>
+
+## Pending means signed, not applied
+
+A pending transaction has been signed by a wallet, but it is not yet a state transition that every node accepts. It can still fail because of an insufficient balance, a wrong nonce, an invalid signature, or a competing transaction using the same sequence number.
+
+<LedgerLab focus="pool" />
+
+Watch the queue: after broadcast, balances and nonces stay unchanged. Only mining makes the node execute the transactions.
+
+<Concept title="A transaction pool is not one simple first-in-first-out queue">
+<p>Real nodes use account nonces, fees, validity checks, and local policy to manage transactions. This lab keeps one observable pending queue and a deterministic order so the constraint stays visible.</p>
+</Concept>
+
+## The same nonce can be replaced, but not applied twice
+
+If a pending transaction is no longer what you want, a wallet can broadcast a new version with the same nonce. The state machine can only make that sequence number succeed once; an older version does not cause a second debit after replacement.
+
+<Think>
+<p>Broadcast a 120-point transfer, then replace it with 260 using the same nonce. Why must the signature be generated again? Because the signature authorizes the combination of amount, recipient, and nonce.</p>
+</Think>
+
+<MechanismDetails>
+
+```text
+replace(pending, nextAmount):
+  require pending.status == PENDING
+  pending.amount = nextAmount
+  pending.signature = sign(pending.fields)
+
+mine(queue):
+  for tx in queue:
+    if tx.nonce == account[tx.from].nonce and verify(tx):
+      apply(tx)
+    else:
+      reject(tx)
+```
+
+Real chains also use a higher fee to make replacement attractive to block producers. The core constraint remains: one nonce is one slot in an account's state machine.
+
+</MechanismDetails>
+
+<Checkpoint
+  id="transaction-pool"
+  question="Why does replacing a transaction with the same nonce not debit the account twice?"
+  options={["Pending transactions are never mined", "One nonce can succeed only once, so the state machine applies one valid version", "Replacement transactions do not need signatures"]}
+  correctIndex={1}
+  explanation="A pool may hold versions, but the state machine accepts only one successful transition for the current nonce. The replacement must also be signed again."
+/>
+
+<SourceList>
+
+- [Ethereum.org: Transactions](https://ethereum.org/developers/docs/transactions/)
+- [Ethereum.org: Transaction lifecycle](https://ethereum.org/developers/docs/transactions/#transaction-lifecycle)
+- [Ethereum Yellow Paper: State transition](https://ethereum.github.io/yellowpaper/paper.pdf)
+
+</SourceList>

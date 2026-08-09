@@ -1,0 +1,45 @@
+import { LessonLead, Concept, Think, MechanismDetails, Checkpoint, SourceList } from "@/platform/components/LessonPrimitives"
+import { GovernanceLab } from "@/modules/governance/components/GovernanceLab"
+
+<LessonLead>
+Token governance makes representation computable, but not simple. Delegation, snapshots, abstention, and quorum determine when a vote counts and whether the proposal has enough participation to continue.
+</LessonLead>
+
+## Freeze voting power before counting
+
+When Alice delegates 420,000 tokens to Bob, Bob represents 750,000. The proposal creation moment takes the snapshot; later transfers do not quietly rewrite an active vote.
+
+<GovernanceLab focus="voting" locale="en" />
+
+Select the delegation scenario, delegate Alice to Bob, then create the proposal. Try to vote as Alice and observe the duplicate-power boundary. Let Bob vote and compare participation with support.
+
+<Concept title="Quorum and majority answer different questions">
+<p>Quorum asks whether enough power participated. Majority asks whether for beats against. A proposal can have a strong majority and still fail quorum, or reach quorum and lose to opposition.</p>
+</Concept>
+
+<Think><p>Abstain supports neither side. Should it count as participation? Why keep that statistic separate?</p></Think>
+
+<MechanismDetails>
+
+```text
+snapshot = balances + delegation at proposal creation
+participation = for + against + abstain
+pass = participation >= quorum && for > against
+```
+
+Delegation changes representation, not token supply. Production systems also need to consider delegation chains, locked voting, transfers, and sybil resistance.
+
+</MechanismDetails>
+
+<Checkpoint
+  id="governance-voting-power"
+  question="Why can Bob not vote Alice's delegated power a second time?"
+  options={["Delegation assigns Alice's snapshot power to Bob; the same power cannot be counted twice", "Only the proposer may vote", "Abstain votes automatically become against votes"]}
+  correctIndex={0}
+  explanation="Delegation changes who represents a unit of power, not how many units exist."
+/>
+
+<SourceList>
+- [OpenZeppelin Votes](https://docs.openzeppelin.com/contracts/5.x/api/governance#Votes)
+- [OpenZeppelin Governor](https://docs.openzeppelin.com/contracts/5.x/governance)
+</SourceList>

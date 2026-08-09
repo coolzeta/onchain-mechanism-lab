@@ -1,0 +1,59 @@
+import { LessonLead, Concept, Think, MechanismDetails, Checkpoint, SourceList } from "@/platform/components/LessonPrimitives"
+import { StablecoinLab } from "@/modules/stablecoins/components/StablecoinLab"
+
+<LessonLead>
+The hardest moment for a stability promise is not when nobody trades; it is when everyone wants out at once. Supply alone hides reserve losses, stale prices, and redemption order. Put them on one state ledger.
+</LessonLead>
+
+## Reserves, supply, and exit pressure
+
+Once a system has issued 500 USD-LAB, it must keep answering:
+
+- What are reserves worth at the current price?
+- How much liability does the stablecoin supply represent?
+- After some holders redeem first, how much reserve still covers the remaining supply?
+- Is the price input current, or already stale?
+
+<StablecoinLab locale="en" focus="reserve" />
+
+<Concept title="A solvent snapshot does not guarantee a smooth exit">
+<p>A collateral ratio is a snapshot based on price inputs. Reserves may be illiquid, prices may fall, the oracle may lag, and redemption may face fees, queues, or pause controls. Good risk education makes each boundary visible.</p>
+</Concept>
+
+<Think>
+<p>If reserves lose 50% but supply does not change, should the interface lead with “stable” or “undercollateralized”? Which metric would you put first?</p>
+</Think>
+
+<MechanismDetails>
+
+```text
+reserveValue = reserve × oraclePrice
+liability    = supply × targetPrice
+coverage     = reserveValue / liability
+
+if coverage < liquidationThreshold:
+  expose the shortfall
+```
+
+Stablecoin systems often also need reserve disclosure, risk-parameter governance, pause or liquidation paths, and a clear loss-absorber. This lab keeps the state small but makes conservation checks and bad states visible.
+
+</MechanismDetails>
+
+<Checkpoint
+  id="stablecoin-reserve-run"
+  question="Why does existing supply not prove that every holder can exit at $1?"
+  options={["Exit depends on usable reserves, correct price inputs, and executable redemption capacity", "More supply automatically creates more reserves", "The market price always replenishes reserves for the protocol"]}
+  correctIndex={0}
+  explanation="Supply is a liability record, not a reserve asset. Reserve loss, wrong prices, and liquidity constraints can make the exit promise incomplete."
+/>
+
+## Recap: stability is not one number
+
+A credible stablecoin system should state its target, collateral, issuance ceiling, redemption rule, reserve condition, price input, and loss absorber. Hide any one of them and users may mistake a label for a mechanism.
+
+<SourceList>
+
+- [BIS: Stablecoin arrangements and reserve risks](https://www.bis.org/cpmi/publ/d206.htm)
+- [Circle: Reserve transparency](https://www.circle.com/en/transparency)
+
+</SourceList>

@@ -1,0 +1,67 @@
+import { LessonLead, Concept, Think, MechanismDetails, Checkpoint, SourceList } from "@/platform/components/LessonPrimitives"
+import { LendingLab } from "@/modules/lending/components/LendingLab"
+
+<LessonLead>
+借贷协议不是把“价值”凭空变成现金。它先接收一项可以被验证和处置的抵押品，再按照一个低于 100% 的借款率给出额度。这个折扣是为了给价格波动、交易成本和清算时间留下缓冲。
+</LessonLead>
+
+## 一笔借款里有三种不同的数字
+
+假设你存入 100 TOKEN，预言机价格是每枚 120 积分。抵押品的账面价值是 12,000 积分，但这不等于你能借出 12,000：
+
+- **抵押品价值**：协议按当前预言机价格估出来的资产价值；
+- **借款率（LTV）**：允许债务占抵押品价值的最大比例；
+- **协议流动性**：借款池当前实际能拿出来的积分。
+
+本实验把最大 LTV 设为 75%，因此安全额度最多是 9,000 积分。它既不是 TOKEN 的“真实价格”，也不是协议对你未来偿还能力的保证。
+
+<LendingLab focus="collateral" />
+
+<Concept title="抵押品是风险缓冲，不是免费信用">
+<p>协议把资产锁住，是为了在借款人无法偿还时仍有可处置的东西。LTV 越低，缓冲越厚；LTV 越高，资本效率越高，但价格下跌时更快触发清算。</p>
+</Concept>
+
+## 额度还要受池子余额约束
+
+即使你的账户有足够抵押品，借贷池也可能没有足够的积分可借。一个负责任的界面至少要同时展示“你的额度”和“池子剩余流动性”，否则用户会把风险边界误读成可提款余额。
+
+<Think>
+<p>如果抵押品价值是 12,000、最大 LTV 是 75%，但池子只剩 2,000 积分，账户应该显示可以借 9,000 还是 2,000？为什么？</p>
+</Think>
+
+<MechanismDetails>
+
+```text
+collateralValue = deposited * oraclePrice
+borrowCapacity = collateralValue * maxLTV
+available = min(borrowCapacity - debt, poolLiquidity)
+
+borrow(amount):
+  require amount <= available
+  debt += amount
+  poolLiquidity -= amount
+  userCash += amount
+```
+
+借款改变的是协议和账户之间的负债关系；它不会改变抵押品的市场价格，也不会让风险消失。
+
+</MechanismDetails>
+
+<Checkpoint
+  id="lending-collateral-capacity"
+  question="100 TOKEN 价值 12,000 积分，最大 LTV 为 75%，在池子流动性足够时最多能借多少？"
+  options={["12,000，因为抵押品值这么多", "9,000，因为协议只允许价值的 75% 变成债务", "3,000，因为只能借四分之一"]}
+  correctIndex={1}
+  explanation="LTV 是借款相对抵押品价值的上限。剩余的 25% 是用来吸收价格波动和清算摩擦的缓冲。"
+/>
+
+## 本章小结
+
+现在账户有抵押品、债务和一条清晰的额度边界。下一章把时间推进：即使价格不动，利息也会让债务和风险慢慢变化。
+
+<SourceList>
+
+- [Aave：借款与健康度概念](https://aave.com/help/borrowing/health-factor)
+- [Compound：借款与抵押因子](https://docs.compound.finance/)
+
+</SourceList>

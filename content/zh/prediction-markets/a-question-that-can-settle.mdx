@@ -1,0 +1,77 @@
+import { LessonLead, Concept, Think, MechanismDetails, Checkpoint, SourceList } from "@/platform/components/LessonPrimitives"
+import { QuestionBuilder } from "@/modules/prediction-markets/components/QuestionBuilder"
+
+<LessonLead>
+预测市场不是从“下注”开始，而是从一份关于未来的合同开始。如果合同的句子不能在某个时刻被明确判定为 YES 或 NO，那么后面的价格、交易和结算都没有可靠基础。
+</LessonLead>
+
+## 先认识我们的实验问题
+
+Alice 相信人类很快会再次登月，Bob 认为计划总会延期。两个人的分歧看起来已经足以形成市场：让 Alice 买 YES，Bob 买 NO，不就可以了吗？
+
+问题在于，“很快”究竟是哪一天之前？无人探测器落在月球算不算？宇航员绕月飞行算不算？一家商业公司的直播和 NASA 的任务报告发生冲突时，又该听谁的？
+
+这些不是文案细节，而是**资产本身的定义**。YES 份额最终能否兑付，完全取决于这句话如何被解释。
+
+<Think>
+<p>“今年某个 AI 模型会通过图灵测试吗？”为什么不是一个容易结算的问题？试着找出其中至少两个没有定义的词。</p>
+</Think>
+
+## 一份合格规则需要三个锚点
+
+1. **截止时间**：最晚在什么时候观察结果，并明确时区。
+2. **可观察事件**：必须发生什么，而不是人们“普遍认为”发生了什么。
+3. **结果来源**：冲突出现时，以哪个预先约定的公开来源为准。
+
+<QuestionBuilder />
+
+<Concept title="市场不是在预测一句话，而是在交易一份结算规则">
+<p>标题可以简短，决定资产含义的是规则正文。两份标题相同、规则不同的市场，实际上是两种不同资产。</p>
+</Concept>
+
+## 边界情况必须提前写进合同
+
+现实经常不会礼貌地只给出 YES 或 NO。任务可能已经起飞却在截止时间后落地；官方来源可能暂时无法访问；事件也可能因为定义变化而失去意义。因此成熟的市场还会写明：
+
+- 延迟发布的数据如何处理；
+- 事件取消或来源失效是否按“无效市场”退款；
+- 谁可以发起争议，争议持续多久；
+- 多个来源冲突时的优先级。
+
+这些规则都应当在交易之前公开。否则参与者买到的不是相同的风险，市场价格也就失去了共同含义。
+
+<MechanismDetails>
+
+```text
+MarketRule {
+  question
+  closeTime
+  resolutionTime
+  source
+  yesCondition
+  invalidCondition
+}
+
+只有所有必填项明确后，市场才能从 DRAFT 进入 OPEN。
+```
+
+</MechanismDetails>
+
+<Checkpoint
+  id="question-contract"
+  question="下面哪一个最接近可直接结算的市场问题？"
+  options={["比特币明年表现会好吗？", "截至 2028-12-31，NASA 是否公布有人类再次接触月球表面的任务成功报告？", "AI 什么时候会超过人类？"]}
+  correctIndex={1}
+  explanation="它给出了截止时间、可观察事件和结果来源；另外两个仍依赖主观解释。"
+/>
+
+## 本章小结
+
+我们现在有了一份所有参与者共同理解的二元合同。下一章会回答更关键的问题：即使判断条件明确，获胜者的钱从哪里来？
+
+<SourceList>
+
+- [Polymarket：市场与事件](https://docs.polymarket.com/market-data/overview)
+- [Gnosis Conditional Tokens：条件与结果集合](https://gnosis-conditional-tokens.readthedocs.io/)
+
+</SourceList>

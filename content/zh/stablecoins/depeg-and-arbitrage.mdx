@@ -1,0 +1,58 @@
+import { LessonLead, Concept, Think, MechanismDetails, Checkpoint, SourceList } from "@/platform/components/LessonPrimitives"
+import { StablecoinLab } from "@/modules/stablecoins/components/StablecoinLab"
+
+<LessonLead>
+脱锚不是一个按钮能修好的 bug。它暴露了市场价格、协议目标、储备资产和参与者激励之间的断点。我们先让 USD-LAB 跌到 0.94 美元，再看赎回路径能提供什么方向。
+</LessonLead>
+
+## 套利者在修复哪一个价格
+
+当 USD-LAB 在市场上低于 1 美元，而协议仍允许接近 1 美元的赎回时，套利者可能：
+
+1. 在市场上低价买入 USD-LAB；
+2. 按协议规则赎回储备资产；
+3. 赚取市场价与赎回价之间的差额，同时让供应减少。
+
+这条路径并不保证价格立刻回到 1 美元。它还依赖储备可用、赎回没有被暂停、市场有流动性，以及价格输入没有被错误数据污染。
+
+<StablecoinLab focus="depeg" />
+
+<Concept title="供应收缩是压力，不是魔法">
+<p>赎回会销毁代币，减少市场上可交易的供应；但供应减少本身不能凭空创造储备。若储备不可信或退出受限，套利者不会只因为目标价格写着 1.00 就承担风险。</p>
+</Concept>
+
+<Think>
+<p>如果 USD-LAB 市场价是 0.94，而赎回手续费和交易成本一共超过 6%，套利者还会愿意参与吗？这说明了什么？</p>
+</Think>
+
+<MechanismDetails>
+
+```text
+marketPrice < targetPrice
+  → buy discounted stablecoin
+  → redeem at the protocol rule
+  → burn supply and receive reserve
+```
+
+套利把两个价格之间的差异变成行为激励，但它不能替代储备证明、流动性和正确的外部数据。系统设计要把“能套利”与“能兑现”分开检查。
+
+</MechanismDetails>
+
+<Checkpoint
+  id="stablecoin-depeg-arbitrage"
+  question="市场价跌到 0.94 美元时，赎回路径为什么可能帮助价格回到目标附近？"
+  options={["低价买入并按接近 1 美元的规则赎回，会减少供应并形成套利买盘", "协议会直接把所有市场订单改成 1 美元", "只要抵押率高，市场价格就不能变化"]}
+  correctIndex={0}
+  explanation="套利利用市场价与协议赎回价的差异，买入并销毁稳定币，形成需求和供应收缩；它仍依赖可用储备与流动性。"
+/>
+
+## 本章小结
+
+你已经看到脱锚修复是一个参与者和储备共同完成的过程，不是单一公式。最后一章把储备打薄，再观察挤兑和预言机错误如何叠加。
+
+<SourceList>
+
+- [金融稳定委员会：全球稳定币安排风险](https://www.fsb.org/2023/07/high-level-recommendations-for-the-regulation-supervision-and-oversight-of-global-stablecoin-arrangements/)
+- [Uniswap：价格与套利的基础机制](https://docs.uniswap.org/contracts/v2/concepts/protocol-overview/how-uniswap-works)
+
+</SourceList>

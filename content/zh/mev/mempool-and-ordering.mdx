@@ -1,0 +1,56 @@
+import { LessonLead, Concept, Think, MechanismDetails, Checkpoint, SourceList } from "@/platform/components/LessonPrimitives"
+import { MEVLab } from "@/modules/mev/components/MEVLab"
+
+<LessonLead>
+一笔交易签名后，并没有立刻成为所有节点都认可的事实。它可能先进入公开交易池，被搜索者观察，被构建者重新排序，最后才在区块执行中改变余额和池子储备。
+</LessonLead>
+
+## Pending 不是已执行
+
+钱包里的“已提交”、节点的 pending 状态和区块里的 executed state 是三件不同的事。公开交易池更像一个等待室：它让其他参与者看到你的交易意图，却不承诺最终顺序。
+
+<MEVLab focus="core" />
+
+实验室里用户用 12,000 积分换 TOKEN。先点“提交到交易池”，你会看到预估输出，但池子储备还没有移动；继续观察交易池、构建排序，直到执行区块，状态才真正落地。
+
+<Concept title="排序本身就是状态转换的一部分">
+<p>如果两笔交易都依赖同一个池子，先执行哪一笔会改变后一笔看到的储备、报价和余额。区块排序不是界面上的装饰，而是共识状态的一部分。</p>
+</Concept>
+
+<Think>
+<p>如果你看到一笔大额交换正在 pending，你能提前知道它最终一定会执行吗？如果不能，搜索者真正掌握的是什么？</p>
+</Think>
+
+<MechanismDetails>
+
+```text
+wallet signs transaction
+  → public/private pending flow
+  → builder chooses an order
+  → proposer publishes a block
+  → every node replays the same state transition
+```
+
+公开交易池不等于共识层；私有订单流也不等于没有排序权。设计系统时，要分别声明可见性、取消/替换、审查和最终执行边界。
+
+</MechanismDetails>
+
+<Checkpoint
+  id="mev-mempool-ordering"
+  question="为什么一笔 pending 交易还没有成为共享状态？"
+  options={["因为它还没有经过区块排序和执行，节点只能把它当作待处理意图", "因为所有 pending 交易都已经按用户提交顺序执行", "因为交易池里的交易不需要签名"]}
+  correctIndex={0}
+  explanation="pending 只说明交易进入了待处理路径。只有被区块排序并执行后，余额和池子储备才成为节点共同重放的结果。"
+/>
+
+## 本章留下的审计问题
+
+当你看到任何“MEV 收益”时，先问三件事：谁看见了什么、谁选择了顺序、哪一笔执行真正移动了资产。把这三个边界分开，才能继续分析夹子交易和回跑套利。
+
+<SourceList>
+
+- [Ethereum.org：交易生命周期](https://ethereum.org/en/developers/docs/transactions/)
+- [Flashbots：MEV 基础](https://docs.flashbots.net/flashbots-auction/overview)
+- [Ethereum.org：区块构建与交易池](https://ethereum.org/en/developers/docs/consensus-mechanisms/pos/block-proposal/)
+
+</SourceList>

@@ -1,0 +1,56 @@
+import { LessonLead, Concept, Think, MechanismDetails, Checkpoint, SourceList } from "@/platform/components/LessonPrimitives"
+import { MEVLab } from "@/modules/mev/components/MEVLab"
+
+<LessonLead>
+A signed transaction is not immediately a fact every node agrees on. It can enter a public mempool, be observed and reordered by a searcher or builder, and only change balances and pool reserves when a block executes it.
+</LessonLead>
+
+## Pending is not executed
+
+“Submitted” in a wallet, pending in a node, and executed in a block are three different states. A public mempool is a waiting room: it reveals intent to other participants without promising the final order.
+
+<MEVLab focus="core" locale="en" />
+
+The lab starts with a user swapping 12,000 credits for TOKEN. Submit it to the mempool and watch the quote appear while reserves stay unchanged; only after a block order is built and executed does the state settle.
+
+<Concept title="Ordering is part of the state transition">
+<p>When two transactions depend on the same pool, the first one changes the reserves, quote, and balances seen by the second. Block order is not interface decoration; it is part of consensus state.</p>
+</Concept>
+
+<Think>
+<p>If you can see a large swap pending, do you know it will definitely execute? If not, what information does a searcher actually possess?</p>
+</Think>
+
+<MechanismDetails>
+
+```text
+wallet signs transaction
+  → public/private pending flow
+  → builder chooses an order
+  → proposer publishes a block
+  → every node replays the same state transition
+```
+
+A public mempool is not the consensus layer; private order flow is not the absence of ordering power. A sound design names visibility, cancellation/replacement, censorship, and execution boundaries separately.
+
+</MechanismDetails>
+
+<Checkpoint
+  id="mev-mempool-ordering"
+  question="Why has a pending transaction not become shared state yet?"
+  options={["It has not been ordered and executed in a block, so nodes still treat it as pending intent", "Every pending transaction already executes in the order users submitted it", "Mempool transactions do not need signatures"]}
+  correctIndex={0}
+  explanation="Pending only means the transaction entered a waiting path. Balances and pool reserves become replayable shared state after block ordering and execution."
+/>
+
+## The audit question left behind
+
+When you see an “MEV profit” number, ask three things: who saw what, who chose the order, and which execution moved the asset. Keep those boundaries separate before moving to sandwiches and back-runs.
+
+<SourceList>
+
+- [Ethereum.org: transaction lifecycle](https://ethereum.org/en/developers/docs/transactions/)
+- [Flashbots: MEV overview](https://docs.flashbots.net/flashbots-auction/overview)
+- [Ethereum.org: block proposal](https://ethereum.org/en/developers/docs/consensus-mechanisms/pos/block-proposal/)
+
+</SourceList>

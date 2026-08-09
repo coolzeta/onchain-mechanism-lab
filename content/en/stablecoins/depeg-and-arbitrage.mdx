@@ -1,0 +1,58 @@
+import { LessonLead, Concept, Think, MechanismDetails, Checkpoint, SourceList } from "@/platform/components/LessonPrimitives"
+import { StablecoinLab } from "@/modules/stablecoins/components/StablecoinLab"
+
+<LessonLead>
+A depeg is not a bug fixed by one button. It exposes the gap between market price, protocol target, reserve assets, and participant incentives. Drop USD-LAB to $0.94, then inspect what redemption can actually do.
+</LessonLead>
+
+## Which price is the arbitrageur repairing?
+
+When USD-LAB trades below $1 while the protocol still permits redemption near $1, an arbitrageur may:
+
+1. buy USD-LAB cheaply in the market;
+2. redeem it for reserve assets under the protocol rule;
+3. keep the difference while shrinking supply.
+
+This path does not guarantee that price returns to $1 immediately. It depends on available reserves, redemption not being paused, market liquidity, and clean price inputs.
+
+<StablecoinLab locale="en" focus="depeg" />
+
+<Concept title="Supply contraction is pressure, not magic">
+<p>Redemption burns tokens and reduces tradable supply, but supply reduction cannot create reserves from nothing. If reserves are untrusted or exits are restricted, an arbitrageur will not take risk just because the target is written as 1.00.</p>
+</Concept>
+
+<Think>
+<p>If USD-LAB trades at $0.94 but redemption fees and trading costs exceed 6%, would an arbitrageur participate? What boundary does that reveal?</p>
+</Think>
+
+<MechanismDetails>
+
+```text
+marketPrice < targetPrice
+  → buy discounted stablecoin
+  → redeem under the protocol rule
+  → burn supply and receive reserve
+```
+
+Arbitrage turns a price gap into a behavioral incentive, but it cannot replace reserve proof, liquidity, or correct outside data. Check “can arbitrage” and “can redeem” as separate conditions.
+
+</MechanismDetails>
+
+<Checkpoint
+  id="stablecoin-depeg-arbitrage"
+  question="Why can redemption sometimes help a $0.94 stablecoin move back toward its target?"
+  options={["Buying cheaply and redeeming near $1 can shrink supply and create buy pressure", "The protocol directly rewrites every market order to $1", "A high collateral ratio means the market price cannot move"]}
+  correctIndex={0}
+  explanation="Arbitrage uses the gap between market price and redemption value, buying and burning tokens to create demand and supply contraction; it still needs reserves and liquidity."
+/>
+
+## The state you carry forward
+
+Depeg repair is a process completed by participants and reserves, not a single formula. Finally, thin the reserves and watch a run and stale oracle data compound.
+
+<SourceList>
+
+- [Financial Stability Board: Global stablecoin arrangements](https://www.fsb.org/2023/07/high-level-recommendations-for-the-regulation-supervision-and-oversight-of-global-stablecoin-arrangements/)
+- [Uniswap: Price and arbitrage mechanics](https://docs.uniswap.org/contracts/v2/concepts/protocol-overview/how-uniswap-works)
+
+</SourceList>

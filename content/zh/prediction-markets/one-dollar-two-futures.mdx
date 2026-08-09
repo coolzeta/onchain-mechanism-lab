@@ -1,0 +1,71 @@
+import { LessonLead, Concept, Think, MechanismDetails, Checkpoint, SourceList } from "@/platform/components/LessonPrimitives"
+import { CollateralLab } from "@/modules/prediction-markets/components/CollateralLab"
+
+<LessonLead>
+YES 和 NO 不是两种凭空出现的筹码。一个最容易验证的设计是：先锁定 100 积分，再同时生成一份 YES 和一份 NO。未来无论哪边获胜，抵押池都恰好能够支付 100。
+</LessonLead>
+
+## 把未来拆成两张收据
+
+假设你向市场合约存入 100 积分。合约把它锁起来，并给你两张结果份额：
+
+- 一份 **YES**：如果事件发生，兑付 100；否则兑付 0。
+- 一份 **NO**：如果事件不发生，兑付 100；否则兑付 0。
+
+两张份额合在一起覆盖了所有可能结果，所以它们被称为一套“完整份额”。在市场结算前，你也可以把一份 YES 和一份 NO 合并，取回最初的 100 积分。
+
+<CollateralLab />
+
+<Concept title="YES + NO 的价值锚定在同一份抵押资产上">
+<p>不是公式规定它们必须值 100，而是任何人都能用 100 积分铸造一对、也能用完整的一对赎回 100。铸造和合并提供了套利边界。</p>
+</Concept>
+
+## 为什么不能等结算时再找输家收钱
+
+如果 Bob 只口头承诺“输了以后付钱”，到结算时他可能已经离开、破产或拒绝支付。预测市场要让陌生人交易，就不能把兑付依赖于未来的信用。
+
+提前抵押把信用风险变成了一个当前可检查的状态：发行了多少对份额，结算合约里就必须有多少个 100 积分。任何人都可以验证这个不变量。
+
+<Think>
+<p>如果系统发行了 37 对 YES/NO，却只锁定 3,200 积分，最坏情况下缺口是多少？谁会承担这个缺口？</p>
+</Think>
+
+## 份额有了，价格还没有
+
+完整的一对总共可以兑付 100，但这不代表 YES 必须值 50、NO 必须值 50。Alice 可能愿意用 70 买 YES，而 Bob 只愿意用 35 买 YES。价格要等不同观点带着真实预算进入市场后才会出现。
+
+<MechanismDetails>
+
+```text
+split(100 credits):
+  collateral += 100
+  mint(YES, 1)
+  mint(NO, 1)
+
+resolve(YES):
+  redeem(YES) -> 100
+  redeem(NO)  -> 0
+```
+
+核心不变量：`锁定抵押 >= 尚未兑付的获胜份额 × 100`。
+
+</MechanismDetails>
+
+<Checkpoint
+  id="full-collateral"
+  question="为什么每一对 YES/NO 需要锁定 100 积分？"
+  options={["为了让市场价格保持在 50", "为了无论哪个结果发生，获胜的一份都能兑付 100", "为了支付撮合引擎手续费"]}
+  correctIndex={1}
+  explanation="抵押服务于未来兑付，与当前市场价格无关。价格可以变化，但最大总赔付不会变化。"
+/>
+
+## 本章小结
+
+系统已经拥有足额抵押的二元结果份额。下一章，Alice、Bob 和 Carol 会把各自的判断翻译成可以被撮合的订单。
+
+<SourceList>
+
+- [Polymarket：结果头寸如何拆分、合并和赎回](https://docs.polymarket.com/trading/positions/how-positions-work)
+- [Conditional Tokens Framework](https://github.com/gnosis/conditional-tokens-contracts)
+
+</SourceList>

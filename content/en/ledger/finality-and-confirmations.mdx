@@ -1,0 +1,51 @@
+import { LessonLead, Concept, Think, MechanismDetails, Checkpoint, SourceList } from "@/platform/components/LessonPrimitives"
+import { LedgerLab } from "@/modules/ledger/components/LedgerLab"
+
+<LessonLead>
+Seeing a transaction in a block does not mean an application can treat it as an irreversible fact. Produce consecutive blocks and advance a simplified finality switch to separate “included”, “confirmed”, and “safe to depend on”.
+</LessonLead>
+
+## Height, confirmations, and finality
+
+Block height says where the chain is. Confirmations say how many later layers exist. Finality says whether an application can depend on the state under its consensus rules. Networks provide different guarantees; this lab builds intuition by advancing finality one block at a time.
+
+<LedgerLab focus="finality" />
+
+Mine the first transfer block, create empty blocks for confirmation buffer, and then advance finality. Chain height can grow while finality moves at its own pace.
+
+<Concept title="Confirmations are a buffer, not a universal magic number">
+<p>More blocks can increase reorganization cost, but that is not the same as every network's economic or consensus finality. Bridges, exchanges, and lending protocols choose their own risk thresholds.</p>
+</Concept>
+
+<Think>
+<p>If a prediction market paid out as soon as an oracle report appeared, and the chain reorganized afterwards, what state could the application safely depend on? Risk policy and rollback behavior belong in the design.</p>
+</Think>
+
+<MechanismDetails>
+
+```text
+if block.height <= finalizedHeight:
+  application_may_depend_on(block)
+else:
+  wait_for_more_confirmations()
+```
+
+Real networks use validator votes, economic penalties, or other consensus rules. This lab only models the separation between block production and an application's finality choice.
+
+</MechanismDetails>
+
+<Checkpoint
+  id="ledger-finality"
+  question="Why might an application wait after a block is mined?"
+  options={["Because the block has no transactions", "Later confirmations and consensus finality determine whether the state is safe to depend on", "Because balances change only after a page refresh"]}
+  correctIndex={1}
+  explanation="Inclusion is one state transition. Confirmations and finality provide additional assurance that the transition will remain stable."
+/>
+
+<SourceList>
+
+- [Ethereum.org: Proof-of-stake finality](https://ethereum.org/developers/docs/consensus-mechanisms/pos/#finality)
+- [Ethereum.org: Blocks](https://ethereum.org/developers/docs/blocks/)
+- [Ethereum.org: Fork choice](https://ethereum.org/developers/docs/intro-to-ethereum/#fork-choice)
+
+</SourceList>

@@ -1,0 +1,56 @@
+import { LessonLead, Concept, Think, MechanismDetails, Checkpoint, SourceList } from "@/platform/components/LessonPrimitives"
+import { GovernanceLab } from "@/modules/governance/components/GovernanceLab"
+
+<LessonLead>
+治理不是一场把意见数成百分比的投票，而是一条把“有人想改变协议”变成“协议状态真的改变了”的状态链。提案先描述目标和参数，之后才可能被投票、排队和执行。
+</LessonLead>
+
+## 从一句话到一条状态转换
+
+“把手续费降到 0.20%”听起来像一项决定，但机器需要知道目标合约、动作类型和参数。没有这些字段，节点无法验证每个人是否在投同一件事，也无法重放执行结果。
+
+<GovernanceLab focus="core" />
+
+实验室里创建提案后，右侧的手续费仍然是 0.30%。这不是延迟，而是边界：投票记录的是许可，执行动作才会写入协议状态。
+
+<Concept title="提案是被延迟执行的状态转换">
+<p>一份可审计提案至少要能回答：谁提出、改变哪个目标、调用什么动作、携带什么参数、执行后哪些余额或配置会变化。文本标题只是给人看的索引。</p>
+</Concept>
+
+<Think>
+<p>如果投票通过后任何人都能把参数改成另一个值，大家究竟投票通过了什么？</p>
+</Think>
+
+<MechanismDetails>
+
+```text
+draft
+  → voting(snapshot power)
+  → succeeded / defeated
+  → queued(timelock)
+  → ready
+  → execute(target, action, parameters)
+```
+
+链上实现通常把动作编码为目标地址、函数选择器和 calldata。教育模拟把它们压缩成目标、动作和值，但保留同一个原则：每一步都是可验证、可重放的状态转换。
+
+</MechanismDetails>
+
+<Checkpoint
+  id="governance-proposal-state"
+  question="为什么投票通过后协议手续费仍然没有立刻改变？"
+  options={["投票只允许提案继续，必须经过时间锁并执行目标动作才会写入状态", "因为投票结果不会记录在链上", "因为金库余额不足时所有参数都会自动回滚"]}
+  correctIndex={0}
+  explanation="治理把批准与执行分开。提案进入时间锁后，执行交易才会真正调用目标并改变参数。"
+/>
+
+## 留下审计问题
+
+看到任何“治理已通过”的新闻时，继续追问：提案的精确 calldata 是什么？现在处于排队还是可执行？执行者是谁？这些问题比标题更接近真实的权限边界。
+
+<SourceList>
+
+- [OpenZeppelin Governor：治理流程](https://docs.openzeppelin.com/contracts/5.x/governance)
+- [Ethereum.org：DAO 如何运行](https://ethereum.org/en/dao/)
+
+</SourceList>

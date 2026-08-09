@@ -1,0 +1,31 @@
+{
+  "site": {
+    "name": "Onchain Mechanism Lab",
+    "shortName": "Mechanism Lab",
+    "tagline": "Put abstract rules on the lab bench and watch them work.",
+    "educationNotice": "All assets are virtual credits for education only."
+  },
+  "nav": {
+    "primary": "Primary navigation",
+    "explore": "Explore",
+    "learn": "Learning paths",
+    "curriculum": "Course map",
+    "flow": "Value path",
+    "challenge": "Challenges",
+    "lab": "Lab",
+    "glossary": "Glossary",
+    "progress": "My learning",
+    "journal": "Research journal",
+    "tools": "Learning tools",
+    "toolsDescription": "These tools appear when the journey reaches them, or you can open them directly here.",
+    "flowDescription": "After several mechanisms, inspect how value and risk cross boundaries.",
+    "labDescription": "Leave the lesson prompts and freely change or break the mechanism.",
+    "challengeDescription": "Use cross-module questions to test whether the boundaries really hold.",
+    "glossaryDescription": "Look up unfamiliar terms and return to the related lesson.",
+    "journalDescription": "Save experiment states, compare outcomes, and write your explanation."
+  },
+  "locale": {
+    "switchTo": "中文",
+    "current": "English"
+  }
+}

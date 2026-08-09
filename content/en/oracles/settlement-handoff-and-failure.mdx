@@ -1,0 +1,49 @@
+import { LessonLead, Concept, Think, MechanismDetails, Checkpoint, SourceList } from "@/platform/components/LessonPrimitives"
+import { OracleLab } from "@/modules/oracles/components/OracleLab"
+
+<LessonLead>
+Finalization is an oracle state transition, not automatic permission for a market to pay out. Hand the final result to a prediction market and compare correct reporting, an unchallenged wrong report, and dispute correction.
+</LessonLead>
+
+## Finalization and settlement handoff are separate interfaces
+
+The oracle first determines `finalOutcome`. A downstream market then reads it and begins payout. Separating the steps makes the dependency and handoff auditable and prevents duplicate settlement events.
+
+<OracleLab focus="settlement" />
+
+<Concept title="A wrong flow can still be a valid execution">
+<p>With no challenge, a wrong report can pass the window and be finalized. The protocol followed its own rules but still delivered a wrong fact to the market. That is oracle risk, not a matching or price-discovery bug.</p>
+</Concept>
+
+<Think>
+<p>In the wrong-report scenario, report NO, submit no challenge, advance the window, finalize, and hand the result to the market. Should the market pause, insure, or record an evidence source?</p>
+</Think>
+
+<MechanismDetails>
+
+```text
+oracle.finalize(outcome)
+market.read(finalOutcome)
+require !settlementAcknowledged
+market.settle(winningPositions)
+```
+
+Prediction markets, lending liquidations, bridges, and insurance protocols all depend on similar interfaces. Downstream code should record source, time, challenge result, and risk policy rather than treating “a value exists” as “reality is certainly correct”.
+
+</MechanismDetails>
+
+<Checkpoint
+  id="oracle-settlement-handoff"
+  question="Why make settlement handoff explicit after finalization?"
+  options={["Because the final result is not stored anywhere", "To separate oracle finality from downstream dependency and prevent duplicate settlement", "Because a challenger can edit the final result at any time"]}
+  correctIndex={1}
+  explanation="Finalization belongs to the oracle state machine; handoff belongs to the downstream protocol interface. Explicit boundaries improve auditability."
+/>
+
+<SourceList>
+
+- [Ethereum.org: Oracles](https://ethereum.org/developers/docs/oracles/)
+- [UMA: Optimistic Oracle](https://docs.uma.xyz/protocol-overview/how-does-umas-oracle-work)
+- [Augur: Market settlement concepts](https://docs.augur.net/)
+
+</SourceList>

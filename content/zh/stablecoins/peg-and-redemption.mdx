@@ -1,0 +1,60 @@
+import { LessonLead, Concept, Think, MechanismDetails, Checkpoint, SourceList } from "@/platform/components/LessonPrimitives"
+import { StablecoinLab } from "@/modules/stablecoins/components/StablecoinLab"
+
+<LessonLead>
+“稳定币值 1 美元”不是一个写在名字里的事实，而是一条可以被参与者验证的路径：有人愿意按规则发行，也有人相信自己能够按规则退出。先把这条路径放在实验台上。
+</LessonLead>
+
+## 先拆开三个价格
+
+本实验用虚拟的 USD-LAB 表示稳定币，用 `COLLATERAL` 表示储备资产。界面会同时显示：
+
+- **目标价格**：协议希望 USD-LAB 代表的 1.00 美元；
+- **市场价格**：参与者在外部市场愿意交易的价格；
+- **预言机价格**：协议用来计算储备价值的输入。
+
+它们暂时相同，不代表它们永远相同。只有当发行、储备和赎回规则能被执行，目标价格才不是一句宣传语。
+
+<StablecoinLab focus="peg" />
+
+<Concept title="赎回是稳定币的“出口”">
+<p>如果持有人不能用一枚稳定币换回接近一美元的储备资产，市场价格偏离时就没有明确的套利方向。赎回不是保证市场永远不波动，而是给价格回到目标附近提供一个可验证的参照。</p>
+</Concept>
+
+<Think>
+<p>如果市场价跌到 0.94 美元，但协议没有任何赎回路径，谁会愿意把价格买回 1 美元？先写出你认为必须存在的三个条件。</p>
+</Think>
+
+<MechanismDetails>
+
+```text
+targetPrice = 1.00 USD
+redeem(amount):
+  require holderBalance >= amount
+  burn(amount)
+  collateralOut = amount × targetPrice / oraclePrice - fee
+  reserve -= collateralOut
+```
+
+这里的 `burn` 很重要：赎回不是把一枚代币复制给下一个人，而是减少供应并从储备释放资产。真实协议还要处理最小单位、费用、流动性和暂停机制。
+
+</MechanismDetails>
+
+<Checkpoint
+  id="stablecoin-peg-redemption"
+  question="为什么“代币名字写着 USD”不能单独保证它值 1 美元？"
+  options={["因为名字只是界面文字，稳定需要储备、规则和可执行赎回路径", "因为所有稳定币都应该由算法自动调价", "因为市场价格永远不能偏离目标价"]}
+  correctIndex={0}
+  explanation="稳定币的锚定来自参与者能验证并执行的发行、储备和退出机制，不是来自名称或界面显示。"
+/>
+
+## 本章小结
+
+你现在已经把“1 美元”从一个标签拆成了目标、市场和出口。下一章会问：如果要发行更多 USD-LAB，抵押品需要留下多少安全缓冲？
+
+<SourceList>
+
+- [MakerDAO：DAI 的抵押与稳定机制](https://makerdao.com/whitepaper/)
+- [Circle：USDC 储备与赎回说明](https://www.circle.com/en/transparency)
+
+</SourceList>

@@ -1,0 +1,90 @@
+import { LessonLead, Concept, Think, MechanismDetails, Checkpoint, SourceList } from "@/platform/components/LessonPrimitives"
+import { LedgerLab } from "@/modules/ledger/components/LedgerLab"
+
+<LessonLead>
+链上金融里看似不同的余额、订单和抵押，最后都要落到一件事：节点能不能从一组已确认状态，确定性地验证下一次状态转换。我们从一笔转账开始，不先背共识名词。
+</LessonLead>
+
+## 一笔交易不是一句“我要转账”
+
+实验室里每个账户都有余额和 **Nonce**。你创建的交易至少包含四个会被签名的字段：发送方、接收方、金额和 Nonce。签名证明“拥有对应密钥的人授权了这一组具体字段”，但它不会替节点保证余额足够，也不会直接改变账本。
+
+<LedgerLab />
+
+交易的生命周期可以拆成四步：
+
+1. **签名**：发送者用私钥对交易内容生成签名。
+2. **广播**：交易进入节点的 Pending 队列，其他人可以验证签名。
+3. **打包**：区块生产者选择交易并按顺序执行状态转换。
+4. **确认**：区块和状态根被后续区块引用，重放结果保持一致。
+
+<Concept title="签名授权的是数据，不是一个抽象的‘账户意愿’">
+<p>如果广播后有人把 120 改成 400，原签名就不再对应这笔交易。签名验证失败时，节点应拒绝它，而不是猜测发送者本来想转多少。</p>
+</Concept>
+
+## Nonce 是账户状态的一部分
+
+如果没有 Nonce，同一笔已签名交易可以被广播很多次，节点可能重复执行转账。Nonce 把交易排成账户自己的序列：账户当前期待 0，成功执行后变成 1，下一笔必须使用 1。
+
+在实验室里先用错误的未来 Nonce 广播，再打包区块。你会看到交易被记录为失败，但余额不变、Nonce 也不跳跃。失败尝试可以出现在区块的交易索引里，状态转换却必须明确区分成功和拒绝。
+
+<Think>
+<p>先广播一笔正确 Nonce 的交易但不挖矿，然后在 Pending 队列里篡改金额。为什么节点不能“沿用原来的签名”？因为签名保护的是原始金额和 Nonce 的组合，而不是交易 ID 的外壳。</p>
+</Think>
+
+## 区块固定顺序，状态根压缩结果
+
+区块不是一个神奇的数据库写入按钮。它保存交易顺序、前一个区块哈希和执行后的状态根。节点从上一个状态逐笔执行交易：扣发送者余额、加接收者余额、递增发送者 Nonce，然后计算新的状态摘要。
+
+如果两个节点拿到相同的前状态和相同顺序，它们应该得到相同的余额、Nonce 和状态根；如果其中一个节点得出不同结果，就说明实现、输入或共识出现了问题。
+
+<MechanismDetails>
+
+```text
+verify(tx):
+  check signature(tx.from, tx.fields)
+  check tx.nonce == account[tx.from].nonce
+  check account[tx.from].balance >= tx.amount
+
+apply(tx):
+  account[tx.from].balance -= tx.amount
+  account[tx.to].balance += tx.amount
+  account[tx.from].nonce += 1
+  stateRoot = hash(all accounts and nonces)
+```
+
+真实链还需要费用、Gas、签名算法、交易池策略、区块提议和最终性。这里把密码学压缩成确定性签名摘要，把注意力放在状态转换和可重放性上。
+
+</MechanismDetails>
+
+## 账本是其他金融机制的共同底座
+
+预测市场里的抵押锁定、AMM 里的储备变化、代币发行里的总供应和预言机里的最终结果，都可以被看成一串交易作用于状态。理解账本之后，你就能继续追问：谁授权了这次变化？它是否可重放？失败时哪些字段应该回滚？
+
+<Checkpoint
+  id="transaction-basics"
+  question="为什么已经签名的交易，广播后把金额改掉就会被节点拒绝？"
+  options={["因为区块链不允许任何转账", "因为签名覆盖了金额，篡改后的字段不再匹配原签名", "因为接收方没有打开网页"]}
+  correctIndex={1}
+  explanation="签名不是交易 ID 的装饰，而是对具体字段的授权。金额、接收方或 Nonce 任何一个字段变化，都应该导致签名验证失败。"
+/>
+
+## 用五个问题读懂一笔链上交易
+
+完成实验后，试着解释：
+
+1. 签名验证和余额验证分别回答什么问题？
+2. 为什么 Nonce 要在成功状态转换后递增？
+3. Pending 交易和已确认交易有什么区别？
+4. 一个区块如何承诺交易顺序和前一个区块的连续性？
+5. 为什么状态根可以帮助不同节点发现执行分歧？
+
+这五个问题是理解代币、交易所、借贷和清算的共同入口。更复杂的金融机制不是脱离账本运行，而是把更多可验证的状态和约束叠加在它上面。
+
+<SourceList>
+
+- [Ethereum.org：交易与状态](https://ethereum.org/developers/docs/transactions/)
+- [Ethereum.org：账户与 Nonce](https://ethereum.org/developers/docs/accounts/)
+- [Ethereum Yellow Paper：状态转换与区块](https://ethereum.github.io/yellowpaper/paper.pdf)
+
+</SourceList>

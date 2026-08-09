@@ -1,0 +1,9 @@
+services:
+  onchain-mechanism-lab:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: onchain-mechanism-lab
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:3205:80"

@@ -1,0 +1,74 @@
+import { LessonLead, Concept, Think, MechanismDetails, Checkpoint, SourceList } from "@/platform/components/LessonPrimitives"
+import { MatchingEngineLab } from "@/modules/matching-engine/components/MatchingEngineLab"
+
+<LessonLead>
+An order book is not just a sorted price table. After every state change, a matching engine must still answer who fills first, how much fills, at which price, and whether the remaining assets wait or are released.
+</LessonLead>
+
+## Read the best bid and ask
+
+The virtual pair is **LAB / credits**. Asks sort from low to high; bids sort from high to low:
+
+- **Best ask**: the lowest current sell price.
+- **Best bid**: the highest current buy price.
+- **Spread**: ask minus bid, the space an immediate trade must cross.
+
+As long as best bid is below best ask, the book is not crossed. A new limit order can wait or bring its price into the book and trigger matching.
+
+<MatchingEngineLab locale="en" />
+
+<Concept title="A limit is your boundary, not a promised execution price">
+<p>Buying at 104 means you will pay at most 104. If a resting ask is 102, execution uses 102. Selling at 99 means you will accept at least 99; if a buyer is willing to pay 101, the resting bid can set the fill price.</p>
+</Concept>
+
+## Price priority comes before time priority
+
+Two asks rest at 102: Maker A entered 2 LAB first, Maker B entered 3 later. When you submit BUY 6 @104, the engine fills A's 2 before B's 3. It does not randomize equal-price orders.
+
+That is price-time priority: choose the most favorable price first, then the earliest sequence at that price. Stable sorting and event sequences matter because identical inputs should not produce different balances or settlements.
+
+<Think>
+<p>Try quantity 1 and then 6. Why can the last trade still be 102 while one unit remains resting at 104? Read how much 102-price supply is left.</p>
+</Think>
+
+## A large order may fill only partly
+
+The BUY 6 @104 can access only 5 LAB of asks priced at or below 104. The engine records two fills and leaves 1 LAB resting at 104. This separates intention from fact: requested 6, filled 5, remaining 1. Cancelling releases only the frozen credits for the remaining unit.
+
+<MechanismDetails>
+
+```text
+while bestBid.price >= bestAsk.price:
+  quantity = min(bestBid.remaining, bestAsk.remaining)
+  maker = earlier(bestBid, bestAsk)
+  price = maker.price
+
+  settle(buyer, seller, price, quantity)
+  bestBid.remaining -= quantity
+  bestAsk.remaining -= quantity
+  append(trade, price, quantity, maker)
+```
+
+Production engines add self-trade prevention, tick sizes, batch matching, limits, and circuit breakers. The lab keeps the minimum rule set but exposes each consequence in state, events, and invariants.
+
+</MechanismDetails>
+
+<Checkpoint
+  id="engine-priority"
+  question="Why does BUY 6 @104 fill 5 LAB while 1 LAB remains at 104?"
+  options={["The engine randomly dropped one unit", "Only 5 LAB of asks are priced no higher than 104, so the rest has no counterparty", "A limit order can only fill one unit"]}
+  correctIndex={1}
+  explanation="A limit sets the worst acceptable price. Two asks at 102 total 5 LAB, so the remaining unit must wait at 104 until a compatible ask arrives."
+/>
+
+## Five questions for a matching engine
+
+Ask what the best bid, ask, and spread are; why equal-price orders have an order; why the resting order sets price; how orders, balances, and frozen assets change after a partial fill; and why cancellation cannot erase history. This is the shared skeleton of exchange books, onchain order books, and prediction markets.
+
+<SourceList>
+
+- [Nasdaq: Limit order](https://www.nasdaq.com/glossary/l/limit-order)
+- [Coinbase Exchange: Order types](https://docs.cdp.coinbase.com/exchange/concepts/orders)
+- [Ethereum.org: Decentralized exchanges](https://ethereum.org/defi/#decentralized-exchanges-dex)
+
+</SourceList>

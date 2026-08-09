@@ -1,0 +1,57 @@
+import { LessonLead, Concept, Think, MechanismDetails, Checkpoint, SourceList } from "@/platform/components/LessonPrimitives"
+import { MEVLab } from "@/modules/mev/components/MEVLab"
+
+<LessonLead>
+A large user swap can push the pool price away from an outside reference. A back-runner does not need to beat the user; it only needs to execute after the user, against the reserves that have already changed.
+</LessonLead>
+
+## Where does the gap come from?
+
+When the user buys TOKEN with credits, the pool holds less TOKEN and more credits, so its price rises. That state can temporarily diverge from another market. The searcher sells TOKEN after the user in the same block and captures part of the gap created by the new state.
+
+<MEVLab focus="backrun" locale="en" />
+
+The lab keeps the searcher's starting TOKEN and credits, pool reserves, searcher P/L, and proposer tip on one ledger. A back-run does not create TOKEN; it moves inventory and price again.
+
+<Concept title="Arbitrage profit is a transfer between willing trades, not free protocol value">
+<p>The user accepts impact for immediacy, the pool follows its curve, and the back-runner trades on the other side. Profit is an asset transfer between those executions; fees and the ordering tip are explicit costs.</p>
+</Concept>
+
+<Think>
+<p>Without the user's earlier large trade, could the back-runner receive the same price? That dependency is what makes a back-run different from an unrelated trade.</p>
+</Think>
+
+<MechanismDetails>
+
+```text
+poolPrice_before = pool.quote()
+execute(victim)
+poolPrice_after = pool.quote()
+if poolPrice_after != externalReference:
+    execute(searcher_backrun)
+    pay(ordering_tip)
+```
+
+Real strategies can span pools, use flash liquidity, or combine with liquidations. This teaching model keeps one pool and one deterministic order so the dependency and asset flow stay visible.
+
+</MechanismDetails>
+
+<Checkpoint
+  id="mev-backrun-arbitrage"
+  question="Why does a back-run depend on the user executing first?"
+  options={["The user changes pool reserves and quotes first, creating the state gap the back-runner can use", "A back-runner is not allowed to submit its own transaction", "The protocol mints an arbitrage reward after every user trade"]}
+  correctIndex={0}
+  explanation="A back-runner uses the price and inventory state left by the earlier trade. The return comes from the later exchange and external reference, not a protocol reward minted from nowhere."
+/>
+
+## Put the proposer on the ledger
+
+Ordering power has a price. In this lab the searcher pays an explicit tip to the proposer; real systems can use bundles, gas, builder auctions, and other payment paths. Ask who pays, who receives, and who can reject or reorder the block.
+
+<SourceList>
+
+- [Flashbots: searchers and bundles](https://docs.flashbots.net/flashbots-auction/searchers/understanding-bundles)
+- [Ethereum.org: MEV](https://ethereum.org/en/developers/docs/mev/)
+- [Uniswap: arbitrage and pool rebalancing](https://docs.uniswap.org/contracts/v2/concepts/protocol-overview/how-uniswap-works)
+
+</SourceList>

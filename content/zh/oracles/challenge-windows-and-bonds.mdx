@@ -1,0 +1,52 @@
+import { LessonLead, Concept, Think, MechanismDetails, Checkpoint, SourceList } from "@/platform/components/LessonPrimitives"
+import { OracleLab } from "@/modules/oracles/components/OracleLab"
+
+<LessonLead>
+乐观预言机先接受一个带担保的报告，再给其他参与者时间和经济动机去反驳。本章让报告者和挑战者站到同一张账上，观察错误报告如何被纠正、诚实参与者如何获得奖励。
+</LessonLead>
+
+## 挑战窗口把“现在结算”变成“允许纠错”
+
+初始报告提交后，结果并不立刻交给预测市场。挑战窗口逐步减少，挑战者可以锁定相反结果和自己的担保。窗口结束时，协议要么接受无人反驳的报告，要么把冲突交给仲裁者读取证据。
+
+<OracleLab focus="challenge" />
+
+<Concept title="担保不是事实证明，而是错误的代价函数">
+<p>担保让错误主张变得昂贵，也让正确挑战者有机会获得回报。但如果来源本身错误、挑战成本过高或参与者串通，经济机制仍可能失败。</p>
+</Concept>
+
+<Think>
+<p>在“错误初报”场景报告 NO，再挑战 YES，推进两个窗口并仲裁。注意：挑战者没有修改初报，而是提交了相反主张；仲裁才决定最终结果。</p>
+</Think>
+
+<MechanismDetails>
+
+```text
+submit(report, bond)
+wait(challengeWindow)
+if challenged:
+  winner = resolve_with_evidence()
+  winner.receive(reportBond + challengeBond)
+else:
+  accept(report)
+```
+
+真实系统还要处理多人报告、争议升级、惩罚分配和治理攻击。这里把每一步的锁定余额和事件日志展示出来，帮助你先建立状态机直觉。
+
+</MechanismDetails>
+
+<Checkpoint
+  id="oracle-challenge-economics"
+  question="挑战窗口和经济担保共同解决什么问题？"
+  options={["让任何人都能直接修改区块", "给纠错者时间和动机，让错误报告在结算前有机会被发现", "保证所有数据源永远不会出错"]}
+  correctIndex={1}
+  explanation="挑战窗口提供时间，担保提供激励与代价；二者都不能单独保证现实数据一定正确。"
+/>
+
+<SourceList>
+
+- [UMA：争议与仲裁](https://docs.uma.xyz/protocol-overview/how-does-umas-oracle-work)
+- [Kleros：去中心化仲裁](https://docs.kleros.io/)
+- [Ethereum.org：预言机设计](https://ethereum.org/developers/docs/oracles/)
+
+</SourceList>

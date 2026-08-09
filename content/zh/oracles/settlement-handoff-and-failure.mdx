@@ -1,0 +1,49 @@
+import { LessonLead, Concept, Think, MechanismDetails, Checkpoint, SourceList } from "@/platform/components/LessonPrimitives"
+import { OracleLab } from "@/modules/oracles/components/OracleLab"
+
+<LessonLead>
+最终化只是预言机内部的状态转换，不是市场自动赔付的许可。本章把“最终结果”明确交给预测市场，比较正确报告、错误但无人挑战、以及争议纠正三条路径。
+</LessonLead>
+
+## 最终化和结算交接是两个接口
+
+预言机先确定 `finalOutcome`，再由下游市场读取它并开始兑付。分成两步，能让市场知道自己依赖的是哪个结果、交接是否已经发生，也能防止重复结算事件。
+
+<OracleLab focus="settlement" />
+
+<Concept title="错误流程也可能是‘合法执行’">
+<p>在没有挑战的情况下，一个错误报告可能顺利通过挑战期并被最终化。协议没有违反自己的规则，但它仍然把错误事实交给了市场——这就是预言机风险，而不是撮合或价格发现问题。</p>
+</Concept>
+
+<Think>
+<p>先在“错误初报”场景报告 NO，不提交挑战，推进窗口并最终化，再点击“交给市场结算”。市场应该如何记录这次事实来源？是否需要暂停、保险或人工复核？</p>
+</Think>
+
+<MechanismDetails>
+
+```text
+oracle.finalize(outcome)
+market.read(finalOutcome)
+require !settlementAcknowledged
+market.settle(winningPositions)
+```
+
+预测市场、借贷清算、跨链桥和保险协议都依赖类似接口。下游不应该把“有一个值”误解为“现实一定正确”，而要记录来源、时间、挑战结果和风险策略。
+
+</MechanismDetails>
+
+<Checkpoint
+  id="oracle-settlement-handoff"
+  question="为什么最终化后还要有一次明确的结算交接？"
+  options={["因为最终结果还没有写入任何状态", "把预言机结果和下游市场依赖分开，并防止重复读取或重复结算", "因为挑战者可以在最终化后任意改结果"]}
+  correctIndex={1}
+  explanation="最终化属于预言机状态机，交接属于下游协议接口。明确分层能让依赖、日志和失败处理更可审计。"
+/>
+
+<SourceList>
+
+- [Ethereum.org：预言机](https://ethereum.org/developers/docs/oracles/)
+- [UMA：Optimistic Oracle](https://docs.uma.xyz/protocol-overview/how-does-umas-oracle-work)
+- [Augur：市场结算概念](https://docs.augur.net/)
+
+</SourceList>

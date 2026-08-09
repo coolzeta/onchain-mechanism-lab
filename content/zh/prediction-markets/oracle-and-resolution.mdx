@@ -1,0 +1,78 @@
+import { LessonLead, Concept, Think, MechanismDetails, Checkpoint, SourceList } from "@/platform/components/LessonPrimitives"
+import { OracleLab } from "@/modules/prediction-markets/components/OracleLab"
+
+<LessonLead>
+区块链可以精确执行“如果结果是 YES，就支付 100”，却无法自己抬头看月球。把现实结果写入系统的机制叫预言机，它解决的是输入与信任问题，而不是预测未来。
+</LessonLead>
+
+## 市场关闭以后发生什么
+
+到达截止时间，系统先停止接受新订单并撤销尚未成交的订单。随后，指定的数据来源发布结果，预言机提交 YES、NO 或无效报告。
+
+如果系统立即接受第一份报告，报告者的失误或作恶会直接决定资金归属。因此许多设计还包含挑战窗口、经济担保和争议解决过程。
+
+<OracleLab />
+
+<Concept title="预言机报告事实，不创造事实">
+<p>市场交易阶段产生价格，预言机在截止后报告结算条件是否满足。用市场价格直接决定结果，会把“人们之前相信什么”误当成“现实最后发生了什么”。</p>
+</Concept>
+
+## 再好的撮合也救不了错误输入
+
+假设所有订单都正确签名、抵押完全充足、撮合一笔不差，但预言机最终把真实的 YES 写成 NO。系统会非常精确地把钱支付给错误的一方。
+
+这就是常说的“垃圾进，垃圾出”：链上执行能够保证规则一致，却不能仅靠执行层证明外部事实。预言机设计通常要在速度、成本、去中心化和纠错能力之间权衡。
+
+### 常见的信任模型
+
+- **指定来源**：由预先约定的网站或机构数据决定，简单但存在单点依赖。
+- **多签报告**：多个独立报告者达到阈值后确认，降低单人错误风险。
+- **乐观预言机**：先接受报告，留出挑战期；有人反对时再进入争议。
+- **经济担保**：报告者押入资产，错误报告可能被罚没，让作恶付出成本。
+
+<Think>
+<p>如果报告者押入 1,000 积分，却能通过错误报告获利 100,000，经济担保真的形成约束了吗？</p>
+</Think>
+
+## 结算是一个不可重复的状态转换
+
+最终结果确定后，市场从 `OPEN` 进入 `RESOLVED`。获胜份额可以兑付 100，失败份额兑付 0。每个账户只能领取一次，所有支付总额不得超过锁定抵押。
+
+<MechanismDetails>
+
+```text
+OPEN -> REPORT_PENDING -> DISPUTE_WINDOW -> RESOLVED
+
+redeem(account):
+  require market == RESOLVED
+  require account has not redeemed
+  payout = winningShares(account) * 100
+  mark account redeemed
+  transfer payout
+```
+
+状态先标记、再转账，可以避免同一头寸被重复领取。
+
+</MechanismDetails>
+
+<Checkpoint
+  id="prediction-oracle-role"
+  question="预测市场里的预言机主要负责什么？"
+  options={["根据订单簿预测最可能结果", "按照事先约定的来源，把截止后的现实结果带入结算系统", "保证每一个交易者都能盈利"]}
+  correctIndex={1}
+  explanation="预言机处理现实输入。它不负责形成价格，也不保证预测一定准确。"
+/>
+
+## 你已经走完一个市场的生命周期
+
+现在可以把六章连起来：一份明确规则定义资产；抵押保证未来兑付；订单表达带预算的观点；撮合产生交易与价格；价格提供有条件的信号；预言机把现实结果带回系统完成结算。
+
+自由实验室允许你重新组合这些步骤，并故意制造低流动性、大户冲击和错误预言机。真正的理解通常发生在系统偏离正常路径的时候。
+
+<SourceList>
+
+- [Polymarket：Resolution](https://docs.polymarket.com/polymarket-learn/markets/resolution)
+- [UMA：Optimistic Oracle](https://docs.uma.xyz/developers/optimistic-oracle-v3)
+- [Ethereum.org：Oracle 简介](https://ethereum.org/developers/docs/oracles/)
+
+</SourceList>
