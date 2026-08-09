@@ -13,7 +13,7 @@ npm run dev
 
 ## GitHub Pages
 
-推送到 `main` 后，`.github/workflows/pages.yml` 会运行完整检查、构建静态站点并部署到 GitHub Pages。Pages 构建会读取 GitHub 返回的 `base_path`：默认项目站使用仓库名，自定义域名则使用根路径。普通 Docker 构建不设置该前缀，因此不会影响 `lab.zeta.lol`。
+推送到 `main` 后，`.github/workflows/pages.yml` 会运行完整检查、构建静态站点并部署到 GitHub Pages。Pages 构建会读取 GitHub 返回的 `base_path`：默认项目站使用仓库名，自定义域名则使用根路径。生产域名 `lab.zeta.lol` 由 Cloudflare 代理到 GitHub Pages，源站不再依赖自建服务器。
 
 如需在本地检查 Pages 版本：
 
@@ -21,7 +21,7 @@ npm run dev
 GITHUB_PAGES=true GITHUB_REPOSITORY=coolzeta/onchain-mechanism-lab npm run build
 ```
 
-构建结果位于 `out/`。GitHub Pages 镜像计划使用 `https://chainlab.zeta.lol/`，原有主站仍为 `https://lab.zeta.lol/`。
+构建结果位于 `out/`。线上唯一入口为 <https://lab.zeta.lol/>；Cloudflare 提供代理与缓存，GitHub Pages 提供静态源站。
 
 ## 分层
 
