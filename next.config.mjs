@@ -4,7 +4,8 @@ import createNextIntlPlugin from "next-intl/plugin";
 const withMDX = createMDX({ extension: /\.mdx?$/ });
 const withNextIntl = createNextIntlPlugin("./src/i18n/request.ts");
 const githubRepositoryName = process.env.GITHUB_REPOSITORY?.split("/")[1] ?? "onchain-mechanism-lab";
-const basePath = process.env.GITHUB_PAGES === "true" ? `/${githubRepositoryName}` : "";
+const defaultPagesBasePath = process.env.GITHUB_PAGES === "true" ? `/${githubRepositoryName}` : "";
+const basePath = process.env.PAGES_BASE_PATH ?? defaultPagesBasePath;
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
