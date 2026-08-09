@@ -6,11 +6,11 @@ import { courseMetadata, createLocalizedMetadata, languageAlternates, lessonMeta
 
 describe("SEO contracts", () => {
   it("creates stable trailing-slash canonical and reciprocal language alternates", () => {
-    expect(localizedUrl("zh", "learn/amm")).toBe("https://lab.zeta.lol/zh/learn/amm/");
+    expect(localizedUrl("zh", "learn/amm")).toBe("https://chainlab.zeta.lol/zh/learn/amm/");
     expect(languageAlternates("learn/amm")).toEqual({
-      "zh-CN": "https://lab.zeta.lol/zh/learn/amm/",
-      en: "https://lab.zeta.lol/en/learn/amm/",
-      "x-default": "https://lab.zeta.lol/zh/learn/amm/",
+      "zh-CN": "https://chainlab.zeta.lol/zh/learn/amm/",
+      en: "https://chainlab.zeta.lol/en/learn/amm/",
+      "x-default": "https://chainlab.zeta.lol/zh/learn/amm/",
     });
   });
 
@@ -20,10 +20,10 @@ describe("SEO contracts", () => {
     const course = courseMetadata(prediction!, "zh");
     const lesson = lessonMetadata(prediction!, "en", prediction!.lessons[0].id);
 
-    expect(course.alternates?.canonical).toBe("https://lab.zeta.lol/zh/learn/prediction-markets/");
+    expect(course.alternates?.canonical).toBe("https://chainlab.zeta.lol/zh/learn/prediction-markets/");
     expect(course.description).toContain("六个章节");
     expect(course.openGraph && "images" in course.openGraph ? course.openGraph.images : undefined).toBeTruthy();
-    expect(lesson.alternates?.canonical).toBe("https://lab.zeta.lol/en/learn/prediction-markets/a-question-that-can-settle/");
+    expect(lesson.alternates?.canonical).toBe("https://chainlab.zeta.lol/en/learn/prediction-markets/a-question-that-can-settle/");
     expect(lesson.description).toContain("vague question");
   });
 
@@ -47,8 +47,8 @@ describe("SEO contracts", () => {
     expect(entries).toHaveLength(expectedPerLocale * 2);
     expect(uniqueUrls.size).toBe(entries.length);
     for (const manifest of modules) {
-      expect(uniqueUrls.has(`https://lab.zeta.lol/zh/learn/${manifest.id}/`)).toBe(true);
-      expect(uniqueUrls.has(`https://lab.zeta.lol/en/labs/${manifest.id}/`)).toBe(true);
+      expect(uniqueUrls.has(`https://chainlab.zeta.lol/zh/learn/${manifest.id}/`)).toBe(true);
+      expect(uniqueUrls.has(`https://chainlab.zeta.lol/en/labs/${manifest.id}/`)).toBe(true);
     }
   });
 });
