@@ -1,0 +1,35 @@
+import { LessonLead, Think, Checkpoint, SourceList } from "@/platform/components/LessonPrimitives"
+import { RwaLab } from "@/modules/rwa/components/RwaLab"
+
+<LessonLead>
+A polished asset report cannot answer every question. Investigation connects rights, assets, valuation, exit and failure handling, then checks the evidence and its date for each conclusion.
+</LessonLead>
+
+## Case: three documents from the Harbor Note plan
+
+Continue the fictional Harbor Note example: 1,000 tokens correspond to hypothetical assets reported at $100,000, including $20,000 in immediately available cash. Assume you receive an offering document, a screenshot of onchain supply and a custody-report summary. Instead of assuming what the titles prove, look for:
+
+1. **Rights and entities:** Who is the issuer? Is the holder entitled to a fund unit, a claim against the issuer, or something else? Who owns the assets, who can enforce a claim, and which documents and law apply?
+2. **Assets and custody:** Who produced the report, for what date and scope? Does it verify existence, ownership or valuation, or merely list positions in an account? Are liens, pledges and related parties disclosed?
+3. **Supply and valuation:** Which register corresponds to the onchain supply? Were issuance or redemption requests pending at the reporting date? What is the valuation basis and timestamp? Have liabilities and accrued fees been deducted?
+4. **Exit and restrictions:** Who can redeem, when is the price determined and cash paid, and what fees apply? Are there minimums, eligibility restrictions, suspensions or queues? Are there actual secondary-market buyers?
+5. **Failure and resolution:** Who replaces or resolves an issuer, custodian, manager or service provider that fails? How are asset segregation, claim priority and recovery costs determined? Do not assume every product has the same bankruptcy protection.
+
+Custody confirmations, asset reports and audits each have a scope; an independent report does not automatically cover legal rights, future performance or every liability. When evidence is missing, mark a conclusion **unknown** rather than treating it as verified.
+
+## Experiment: a cash gap is not the final loss
+
+Set assets to $100,000, supply to 1,000, cash to $20,000 and requests to 400 tokens. At the simplified reference value, requests are estimated at $40,000 and the immediate cash gap is $20,000. Change cash and request amounts to see the gap. This model does not sell assets, make payments, account for liabilities or determine priority. Financing or asset sales might close the gap, potentially with costs and delays; final recovery needs case-specific evidence.
+
+<RwaLab />
+
+<Think><p>If a report only confirms that a custody account held assets on one day, but says nothing about pledges, holder rights or redemption timing, what additional documents would you need?</p></Think>
+
+<Checkpoint id="rwa-due-diligence" question="A report confirms assets were held in an account on a given date. Does it prove every token holder can redeem fully at any time?" options={["No: rights, liens, liabilities, available cash and redemption terms also need checking", "Yes: a custody report guarantees all legal rights and future liquidity", "Yes: onchain transfers guarantee redemption at face value for everyone"]} correctIndex={0} explanation="Reports have date and scope limits. Verify legal rights, encumbrances and exit terms separately; an immediate cash gap is not automatically the final loss." />
+
+<SourceList>
+
+- [BIS: Financial stability implications of tokenisation](https://www.bis.org/publications/fsi-summary-financial-stability-implications-tokenisation-executive-summary)
+- [BIS/CPMI: Tokenisation of money and other assets](https://www.bis.org/publications/tokenisation-context-money-and-other-assets-concepts-and-implications-central-banks)
+
+</SourceList>

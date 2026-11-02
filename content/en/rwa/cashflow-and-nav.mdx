@@ -1,0 +1,40 @@
+import { LessonLead, Think, Checkpoint, SourceList } from "@/platform/components/LessonPrimitives"
+import { RwaLab } from "@/modules/rwa/components/RwaLab"
+
+<LessonLead>
+Does interest from an underlying asset reach each token holder as cash at the same rate? To answer, put assets, liabilities, fees, units and distributions on one ledger. Every figure below is hypothetical, not a real fund or a promise of returns.
+</LessonLead>
+
+## From assets to NAV per unit
+
+Use the fictional Harbor Note asset and token quantities, separately assuming the fund-unit structure from lesson one and a separate fee scenario: the tokenized fund has 1,000 units outstanding. Its short-term government securities and cash are worth $100,000 in total, and it owes $2,000 in accrued expenses, with no other liabilities. At this simplified point in time:
+
+```text
+$100,000 assets − $2,000 liabilities = $98,000 net assets
+NAV per unit = $98,000 ÷ 1,000 = $98
+```
+
+The lab below displays **total assets divided by tokens** and does not deduct liabilities. With these assets and units, it shows $100, not the $98 NAV above. It does not accrue fees, estimate returns, or simulate an actual payment.
+
+<RwaLab />
+
+## Record one period of changes
+
+Continuing the example, assume $4,000 of interest actually arrives and was not already included in the asset value above. The fund pays a separate $1,000 fee that was not included in the prior accrued expense. With no other changes, assets become $103,000; the original $2,000 liability remains, leaving $101,000 in net assets, or $101 per unit. This is a hypothetical period amount, not an annualized return or forecast.
+
+If a fee was already accrued as a liability, paying it reduces assets and liabilities together; do not subtract it from NAV a second time. Similarly, when interest already included in valuation is received as cash, it generally should not be counted as new income again. A distribution can reduce fund assets and NAV per unit, while reinvestment can retain value in the fund. Terms, timing, and taxes can affect either path.
+
+## Reference value, trading price and redemption
+
+Even a calculated $101 NAV does not mean a buyer will pay that price on a secondary market. Bids, trading costs and transfer restrictions affect execution; redemption pricing dates, fees, eligibility and settlement time depend on the actual rules. The lab's assumed asset value is not an independently verified NAV.
+
+<Think><p>If an expense is already included as a liability, why should paying it not reduce net assets a second time?</p></Think>
+
+<Checkpoint id="rwa-cashflow-nav" question="A fund has $100,000 in assets, $2,000 in liabilities and 1,000 units. What is NAV per unit?" options={["$98: subtract liabilities before dividing by units", "$100: liabilities do not affect NAV", "$102: add liabilities to assets"]} correctIndex={0} explanation="NAV is assets minus liabilities, divided by the relevant units; it is not a guaranteed execution or redemption price." />
+
+<SourceList>
+
+- [SEC Investor.gov: Net asset value](https://www.investor.gov/introduction-investing/investing-basics/glossary/net-asset-value)
+- [SEC Investor.gov: How fees affect investment portfolios](https://www.investor.gov/introduction-investing/general-resources/news-alerts/alerts-bulletins/investor-bulletins/updated)
+
+</SourceList>

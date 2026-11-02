@@ -11,6 +11,10 @@ export interface GlossaryGroup {
 }
 
 export const glossaryGroups: GlossaryGroup[] = [
+  { title: "现实世界资产", terms: [
+    { term: "现实世界资产（RWA）", definition: "与链外资产或权利相关的资产类别；代币所代表的法律权利取决于具体结构和文件。", relatedModuleId: "rwa", relatedLesson: "rights-and-structure" },
+    { term: "资产对账", definition: "比较发行记录与链下资产、托管及其他相关记录，并调查差异的过程。", relatedModuleId: "rwa", relatedLesson: "issuance-and-custody" },
+  ] },
   {
     title: "预测市场",
     terms: [
@@ -145,6 +149,10 @@ export const glossaryGroups: GlossaryGroup[] = [
 export const glossaryEntries = glossaryGroups.flatMap((group) => group.terms.map((term) => ({ ...term, group: group.title })));
 
 export const englishGlossaryGroups: GlossaryGroup[] = [
+  { title: "Real-world assets", terms: [
+    { term: "Real-world asset (RWA)", definition: "An asset or claim connected to the offchain world; the token holder's legal rights depend on the specific structure and documents.", relatedModuleId: "rwa", relatedLesson: "rights-and-structure" },
+    { term: "Reconciliation", definition: "Comparing issuance records with offchain asset, custody and other records and investigating differences.", relatedModuleId: "rwa", relatedLesson: "issuance-and-custody" },
+  ] },
   { title: "Prediction markets", terms: [
     { term: "Binary market", definition: "A market with two mutually exclusive outcomes, such as YES and NO, whose settlement rule is defined before trading.", relatedLesson: "a-question-that-can-settle", relatedModuleId: "prediction-markets" },
     { term: "Outcome share", definition: "A position that pays a fixed amount when its named outcome occurs, such as one YES share.", relatedLesson: "one-dollar-two-futures", relatedModuleId: "prediction-markets" },

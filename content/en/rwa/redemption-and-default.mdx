@@ -1,0 +1,48 @@
+import { LessonLead, Checkpoint, SourceList } from "@/platform/components/LessonPrimitives"
+import { RwaLab } from "@/modules/rwa/components/RwaLab"
+
+<LessonLead>
+Redemption means requesting an exit from the relevant party under agreed terms; it differs from selling a token to another buyer. Even if the total asset valuation looks sufficient, immediately available cash may be insufficient.
+</LessonLead>
+
+## Trace the exit route
+
+For a particular product, check who can apply, minimum amounts, fees, settlement timing, suspension or queue rules, and where the cash comes from. Some holders may only be able to sell in a secondary market; others may redeem with a specified party under stated conditions. Do not assume every product offers the same exit.
+
+On default or insolvency, examine asset ownership, segregation, contractual rights, creditor priority, applicable law and recovery costs. An onchain balance is not a completed recovery. Even with a legal claim, timing and recovery amounts can be uncertain.
+
+## Case: why queue when assets appear sufficient?
+
+Return to the initial Harbor Note assumptions: $100,000 in total portfolio value including $20,000 cash, and 1,000 tokens. Suppose holders request redemption of 400 tokens. Using the lab's gross allocation of $100 per token, **estimated requests are $40,000; less $20,000 cash gives a $20,000 immediate cash gap**.
+
+This does not mean total assets have fallen to $20,000 or holders must ultimately lose $20,000. Depending on the terms, the issuer might sell other assets, await maturity, queue requests or suspend redemptions; sale prices, fees, timing and rules affect the result. The lab does not perform those actions or determine whether requests are lawful or approved.
+
+## Two exits, different uncertainties
+
+- **Secondary-market sale:** needs an eligible buyer, an effective bid and settlement. Uncertainties include price, depth, transaction costs and whether a buyer exists.
+- **Redemption with the designated party:** needs permitted terms, eligibility, a processing window and sufficient funds. Uncertainties include redemption price, queues, suspension, asset sales and payment timing.
+
+If the issuer defaults or enters insolvency, distinguish three questions: **illiquidity** means cash is insufficient now; **insolvency** concerns assets relative to liabilities; **an individual's eventual recovery** also depends on rights, priority, asset disposal and costs. They can occur together, but one does not automatically prove the other two.
+
+**Your decision:** if cash is zero but a bond matures in one week, what would help you assess a possible delay? Check whether the bond is available and pays at maturity, liabilities and priority, and the redemption terms and processing time. If the bond defaults or is subject to a prior creditor claim, maturity alone may not produce cash for payment.
+
+## Experiment: a cash gap is not a final loss
+
+Change the number of tokens submitted for redemption and available cash. Compare the estimated request value with the cash gap. The gap is only an immediate liquidity indicator in this teaching model: it does not execute redemption or calculate actual net assets, liabilities, fees, liquidation or final recovery. A gap is not automatically a final loss, and no gap does not guarantee actual payment.
+
+<RwaLab />
+
+<Checkpoint
+  id="rwa-redemption-default"
+  question={"What does a gap between estimated redemption requests and available cash show in this experiment?"}
+  options={["Immediate cash may be insufficient under the assumptions; payment and final losses depend on the actual arrangement", "The holder must lose exactly the amount of the gap", "All redemptions are paid immediately because tokens remain transferable"]}
+  correctIndex={0}
+  explanation={"The model compares estimated requests with assumed cash only. Actual outcomes depend on terms, asset disposal, liabilities and other conditions."}
+/>
+
+<SourceList>
+
+- [BIS: Financial stability implications of tokenisation](https://www.bis.org/publications/fsi-summary-financial-stability-implications-tokenisation-executive-summary)
+- [BIS/CPMI: Tokenisation risks and settlement](https://www.bis.org/cpmi/publ/d225.pdf)
+
+</SourceList>

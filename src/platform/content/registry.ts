@@ -11,6 +11,8 @@ import { stablecoinManifest } from "@/modules/stablecoins/manifest";
 import { mevManifest } from "@/modules/mev/manifest";
 import { governanceManifest } from "@/modules/governance/manifest";
 
+import { rwaManifest } from "@/modules/rwa/manifest";
+
 export const categories: CategoryManifest[] = [
   {
     id: "foundations",
@@ -49,6 +51,7 @@ export const modules: ModuleManifest[] = [
   stablecoinManifest,
   mevManifest,
   governanceManifest,
+  rwaManifest,
 ];
 
 modules.forEach((module) => moduleManifestSchema.parse(module));

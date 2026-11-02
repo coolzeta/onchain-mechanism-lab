@@ -1,0 +1,51 @@
+import { LessonLead, Checkpoint, SourceList } from "@/platform/components/LessonPrimitives"
+import { RwaLab } from "@/modules/rwa/components/RwaLab"
+
+<LessonLead>
+Tokens can be issued quickly, but the existence, ownership and encumbrances of offchain assets require separate verification. Look at the asset ledger, custody records and token supply together.
+</LessonLead>
+
+## Reconcile the records
+
+In our fictional example, one entity holds the assets, a custodian performs the agreed safekeeping or record-keeping role, and an issuer creates tokens under stated rules. Actual roles vary, and assets may be pledged or subject to other restrictions. A contract can show outstanding supply, but cannot on its own prove that assets still exist, are unencumbered, are available to holders, or can be sold at a stated value.
+
+Ask who produced the inventory and custody records, their date, how supply maps to the assets, and what an independent review actually covered. Reports can become stale. One report is neither a real-time guarantee nor a substitute for examining legal structure and ongoing operations.
+
+## Trace the case from subscription to reconciliation
+
+Continue with fictional Harbor Note. Assume cash and bonds together are valued at $100,000 and 1,000 tokens are outstanding. We do not assume that each token is necessarily a $100 legal claim: terms, liabilities, priority and fees can change the result.
+
+- **Subscription:** reconcile receipts, subscription list and issuance approval; look for tokens issued before funds arrive or funds received without issuance.
+- **Purchase and custody:** compare trade confirmation, inventory and custodian statements; check for assets held by the wrong entity or already pledged.
+- **Onchain issuance:** check the contract address, mint/burn authority, supply and balances; investigate unauthorized minting or delayed burning after redemption.
+- **Periodic review:** compare same-date assets, liabilities, token supply and exceptions; investigate different reporting dates, pending trades or unexplained discrepancies.
+
+A report saying assets exist is different from a claim that they can satisfy every holder. Check the review's **scope, date, method and author**: a balance confirmation may not verify ownership, encumbrances, valuation or future ability to pay.
+
+## Two reconciliation signals: what would you investigate?
+
+- **Signal A:** onchain supply rises from 1,000 to 1,200 tokens while the custody report is from last month. Check subscriptions, assets in transit, mint authority and the report date. The difference needs an explanation; a timing difference alone does not establish fraud.
+- **Signal B:** the report still lists $100,000 in assets, but discloses that some are pledged. Check who can dispose of them, secured creditors' rights and liabilities; gross assets are not the same as holders' recoverable amount.
+
+**Your decision:** request an explanation, same-date supporting evidence and the identity of the reviewer. An unexplained difference should not simply be treated as proof either of full coverage or of a loss.
+
+## Experiment: does a report update itself?
+
+Change the assumed asset value, advance one reporting period, and compare the current valuation with the report snapshot. Then update the report and compare again. This is a teaching snapshot, not a connection to a custodian, auditor or real assets.
+
+<RwaLab />
+
+<Checkpoint
+  id="rwa-issuance-custody"
+  question={"Does an onchain supply of 100 tokens alone prove sufficient, unencumbered underlying assets?"}
+  options={["No. Check offchain assets, rights, encumbrances and timely independent evidence", "Yes. The onchain balance proves every offchain fact", "Yes. Open source code eliminates the need for custody records"]}
+  correctIndex={0}
+  explanation={"Onchain supply and offchain assets are separate records. Reconciliation needs credible offchain evidence, with attention to timing and scope."}
+/>
+
+<SourceList>
+
+- [IOSCO: Tokenization of financial assets](https://www.iosco.org/library/pubdocs/pdf/IOSCOPD809.pdf)
+- [BIS/CPMI: Tokenisation and settlement infrastructure](https://www.bis.org/cpmi/publ/d225.pdf)
+
+</SourceList>

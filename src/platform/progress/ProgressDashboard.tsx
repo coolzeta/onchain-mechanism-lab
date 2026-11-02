@@ -25,7 +25,7 @@ export function ProgressDashboard({ locale }: { locale: string }) {
     .map((module) => getLocalizedModule(module, locale))
     .sort((a, b) => {
       if (locale !== "en") return 0;
-      const order = ["ledger", "token-launch", "governance", "prediction-markets", "amm", "matching-engine", "mev", "lending", "stablecoins", "oracles"];
+      const order = ["ledger", "token-launch", "governance", "prediction-markets", "amm", "matching-engine", "mev", "lending", "stablecoins", "oracles", "rwa"];
       return order.indexOf(a.id) - order.indexOf(b.id);
     });
   const totalLessons = availableModules.reduce((total, module) => total + module.lessons.length, 0);

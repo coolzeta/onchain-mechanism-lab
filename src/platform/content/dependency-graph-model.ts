@@ -28,19 +28,21 @@ const widePositions: Record<string, DependencyPosition> = {
   lending: { x: 53, y: 76 },
   stablecoins: { x: 20, y: 78 },
   mev: { x: 84, y: 22 },
+  rwa: { x: 82, y: 85 },
 };
 
 const compactPositions: Record<string, DependencyPosition> = {
-  ledger: { x: 22, y: 10 },
-  "token-launch": { x: 78, y: 10 },
-  governance: { x: 22, y: 30 },
-  "prediction-markets": { x: 78, y: 30 },
-  amm: { x: 22, y: 50 },
-  "matching-engine": { x: 78, y: 50 },
-  lending: { x: 22, y: 70 },
-  oracles: { x: 78, y: 70 },
-  stablecoins: { x: 22, y: 90 },
-  mev: { x: 78, y: 90 },
+  ledger: { x: 22, y: 8 },
+  "token-launch": { x: 78, y: 8 },
+  governance: { x: 22, y: 24 },
+  "prediction-markets": { x: 78, y: 24 },
+  amm: { x: 22, y: 40 },
+  "matching-engine": { x: 78, y: 40 },
+  lending: { x: 22, y: 56 },
+  oracles: { x: 78, y: 56 },
+  stablecoins: { x: 22, y: 72 },
+  mev: { x: 78, y: 72 },
+  rwa: { x: 50, y: 88 },
 };
 
 const edgeLabels = {
