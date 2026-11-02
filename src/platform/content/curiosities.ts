@@ -20,6 +20,12 @@ const prompt = (id: string, zhQuestion: string, zhAnswer: string, enQuestion: st
  * one falsifiable question that can be answered by its existing experiment.
  */
 export const lessonCuriosities: Record<string, readonly CuriosityPrompt[]> = {
+  "rwa:cashflow-and-nav": [prompt("rwa-nav-versus-assets", "资产总值除以份额，为什么还不是每份净值？", "资产组合可能还有应付费用和其他负债，必须先扣除负债再除以份额。利息是否分配、何时到账，也要看产品条款。", "Why are assets per token not necessarily NAV per unit?", "A portfolio may owe accrued fees and other liabilities. Subtract liabilities before dividing by units; whether and when interest is distributed also depends on the terms.")],
+  "rwa:due-diligence-and-failure": [prompt("rwa-report-scope", "托管报告显示资产存在，为什么仍不能证明随时能退出？", "报告可能只覆盖某个时点的持仓，未核实法律归属、抵押负担、负债和可用现金。还要检查赎回资格、暂停条件和实际处置流程。", "Why doesn't a custody report prove a holder can exit immediately?", "A report may cover positions at one date without verifying legal ownership, liens, liabilities or available cash. Redemption eligibility, suspension rules and disposal also matter.")],
+  "rwa:rights-and-structure": [prompt("rwa-token-rights", "拿到资产代币，为什么不一定直接拥有资产？", "代币记录可以指向发行人的债权、基金份额或其他安排。要知道持有人对谁享有什么权利，必须核查法律文件、登记方式和适用法律。", "Why does owning a token not necessarily mean owning the asset?", "A token may record a claim against an issuer, a fund interest or another arrangement. Legal documents, registration and applicable law determine the actual rights.")],
+  "rwa:issuance-and-custody": [prompt("rwa-custody-proof", "链上供应透明，为什么还要核查托管报告？", "链上余额可以核对已发行代币，但不能单独证明链下资产存在、归属、没有负担或持续由合适的托管方保管。报告也有时间和核验范围的局限。", "Why check custody if token supply is transparent?", "The chain records supply but cannot by itself prove offchain assets exist, belong to the right entity, are unencumbered or remain in custody. Reports have scope and timing limits too.")],
+  "rwa:valuation-and-transfer": [prompt("rwa-value-sale", "每份参考价值是 100，为什么未必卖得出 100？", "参考价值由估值输入和份额数量计算，可能已经过时；实际交易还要有合格买家、足够买盘和允许转让的规则，成交价格也可能不同。", "Why might a token with a reference value of 100 sell for less?", "The reference value depends on assumptions and may be stale. A sale also requires eligible buyers, sufficient market depth and permitted transfers, so its price can differ.")],
+  "rwa:redemption-and-default": [prompt("rwa-redemption-cash", "资产总价值足够，为什么赎回仍可能延迟？", "可用现金不等于资产总价值，底层资产可能需要时间变现。赎回还受资格、开放时间、费用和合同条款约束，估算缺口不等同最终损失。", "Why can redemption be delayed even when total assets look sufficient?", "Available cash is not the same as total asset value: sales can take time. Eligibility, windows, fees and contract terms also matter; an estimated cash shortfall is not necessarily a final loss.")],
   "prediction-markets:a-question-that-can-settle": [
     prompt("prediction-headline-contract", "新闻标题已经很清楚了，为什么还不能直接拿来下注？", "交易的是一份可执行合同，不是一句大家‘大概懂了’的话。截止时间、判定事件和结果来源少一个，输家就可能在结算时重新解释问题。", "If a headline is clear, why can’t we trade it as-is?", "A market trades an executable contract, not a sentence people roughly understand. Without a deadline, observable event, and named source, the losing side can reinterpret the question at settlement."),
     prompt("prediction-deadline-surprise", "事件提前发生了，市场能不能立刻结算？", "不一定。合同可能要求等到截止时间，确认事件没有被撤销、修正或落入无效条件。‘我们已经知道答案’和‘合同允许结算’是两个状态。", "If the event happens early, can the market settle immediately?", "Not necessarily. The contract may require waiting for the deadline to rule out reversals, corrections, or invalid conditions. Knowing the likely answer and being allowed to settle are different states."),
@@ -170,6 +176,7 @@ export const lessonCuriosities: Record<string, readonly CuriosityPrompt[]> = {
 };
 
 const moduleTeaserPromptIds: Record<string, readonly string[]> = {
+  rwa: ["rwa-token-rights", "rwa-custody-proof"],
   "prediction-markets": ["prediction-sum-over-100", "prediction-sum-under-100"],
   amm: ["amm-infinite-counterparty", "amm-lp-guarantee"],
   governance: ["governance-yes-no-change", "governance-timelock-safety"],

@@ -11,6 +11,7 @@ const moduleMarks: Record<string, string> = {
   ledger: "#",
   lending: "₿",
   stablecoins: "$",
+  rwa: "RWA",
   mev: "↯",
   governance: "⚖",
 };

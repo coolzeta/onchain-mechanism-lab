@@ -1,0 +1,50 @@
+import { LessonLead, Checkpoint, SourceList } from "@/platform/components/LessonPrimitives"
+import { RwaLab } from "@/modules/rwa/components/RwaLab"
+
+<LessonLead>
+A reference value per token is not the price at which you can sell right now. Confusing the two hides liquidity, stale information and transfer restrictions.
+</LessonLead>
+
+## Separate three numbers
+
+In the fictional example, the **total asset valuation** is an assumption. Dividing it by outstanding tokens gives a simple reference estimate per token. This teaching formula excludes liabilities, fees and priority claims; it is not an actual net asset value. The **market execution price** depends on actual buyers, sellers, orders and rules. It may be above or below the reference value, or there may be no buyer at all.
+
+Valuations depend on methods, inputs and time. When underlying assets trade infrequently, an old report may not reflect current conditions. Transfers may also be subject to identity checks, investor eligibility, allowlists or legal restrictions, depending on the product and jurisdiction. Divisibility and programmability do not guarantee market depth.
+
+## Three price labels for the same assets
+
+Continue the Harbor Note assumptions: $100,000 in total portfolio value, including $20,000 cash, and 1,000 tokens issued. The lab's simple figure is **$100,000 ÷ 1,000 = $100 per token**: a gross asset allocation before liabilities.
+
+To illustrate the distinction, separately assume $4,000 of recognized liabilities and no other fees. If all tokens have equal residual rights, no other priority claims exist and the valuation is accurate, the illustrative net assets per token are **($100,000 − $4,000) ÷ 1,000 = $96**. This is a separate paper example: the lab has **no** liability input and does not calculate net assets.
+
+Suppose one secondary-market buyer currently bids $93 each for 100 tokens. This quote does not guarantee a larger sale or prove a trade occurred; more sell orders might require a lower price or new buyers. The **$100 gross allocation, $96 hypothetical net amount and $93 example bid** answer different questions.
+
+## From a reference value to an actual trade
+
+1. Check valuation: which bond price, date and method were used, and is accrued interest included?
+2. Check liabilities and cash flow: how are fees, payables and other priority claims calculated? When does interest arrive and what are holders entitled to receive?
+3. Check execution: are both parties eligible and transfers permitted? Is there enough depth, and what are the trading and settlement costs?
+4. Check timing: do custody evidence, valuation and token supply refer to the same date? Has the report caught up with subsequent price moves?
+
+**Your decision:** if the screen says $100, the hypothetical net figure is $96 and the current executable bid is $93, which figure is the starting point for estimating an immediate sale of 100 tokens? Start with the executable bid, then consider fees, size and changes during execution; that still does not guarantee an actual price.
+
+## Experiment: make the report stale
+
+Change the assumed asset value or token supply and observe the per-token estimate. Advance a reporting period, change the valuation again, and compare the snapshot with the current assumption. Updating refreshes the teaching snapshot; it does not simulate a real quote, trade or compliance review.
+
+<RwaLab />
+
+<Checkpoint
+  id="rwa-valuation-transfer"
+  question={"If the reference value is 100 per token, can you always sell immediately for 100?"}
+  options={["No. Execution depends on buyers, market depth, transfer rules and current information", "Yes. A reference value is an executable bid", "Yes. Technical transferability guarantees a compliant transaction"]}
+  correctIndex={0}
+  explanation={"A valuation is a reference derived from inputs. An actual trade also needs market participants, liquidity and applicable transfer conditions."}
+/>
+
+<SourceList>
+
+- [BIS: Financial stability implications of tokenisation](https://www.bis.org/publications/fsi-summary-financial-stability-implications-tokenisation-executive-summary)
+- [IOSCO: Tokenization of financial assets](https://www.iosco.org/library/pubdocs/pdf/IOSCOPD809.pdf)
+
+</SourceList>

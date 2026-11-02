@@ -29,8 +29,8 @@ describe("dependency graph", () => {
   it("uses a two-column layout on narrow screens", () => {
     const graph = buildDependencyGraph(modules, "compact");
 
-    expect(graph.nodes.find((node) => node.id === "ledger")?.position).toEqual({ x: 22, y: 10 });
-    expect(graph.nodes.find((node) => node.id === "prediction-markets")?.position).toEqual({ x: 78, y: 30 });
+    expect(graph.nodes.find((node) => node.id === "ledger")?.position).toEqual({ x: 22, y: 8 });
+    expect(graph.nodes.find((node) => node.id === "prediction-markets")?.position).toEqual({ x: 78, y: 24 });
     expect(graph.edges).toHaveLength(3);
   });
 });

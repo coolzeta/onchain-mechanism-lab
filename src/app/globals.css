@@ -916,7 +916,7 @@ button:focus-visible, a:focus-visible, summary:focus-visible, input:focus-visibl
   .dependency-graph__header h2 { font-size: 30px; }
   .dependency-graph__controls { width: 100%; justify-content: space-between; }
   .dependency-graph__legend { white-space: normal; }
-  .dependency-graph__canvas { height: 540px; margin-top: 22px; }
+  .dependency-graph__canvas { height: 700px; margin-top: 22px; }
   .dependency-graph__node { width: 112px; min-height: 54px; padding: 9px 22px 8px; }
   .dependency-graph__node strong { max-width: 68px; font-size: 10px; }
   .dependency-graph__node small { font-size: 7px; }

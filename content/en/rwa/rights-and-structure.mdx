@@ -1,0 +1,52 @@
+import { LessonLead, Checkpoint, SourceList } from "@/platform/components/LessonPrimitives"
+import { RwaLab } from "@/modules/rwa/components/RwaLab"
+
+<LessonLead>
+Tokenising a real-world asset (RWA) generally uses a token to record or represent rights related to an offchain asset. Bonds, receivables and real estate are examples; different structures give holders different rights.
+</LessonLead>
+
+## Ask three questions about the structure
+
+Imagine a fictional project holding a portfolio and issuing tokens. Ask **who holds the underlying assets**, **what claim the token holder has against whom**, and **which documents and laws make that claim enforceable**. A token may represent a claim on an issuer or another arrangement. It does not automatically confer direct ownership of the underlying asset.
+
+A smart contract can record balances, transfers and supply. That record alone cannot establish that an offchain claim is enforceable in every jurisdiction. Issuance documents, custody arrangements, applicable law and insolvency terms determine the actual boundaries.
+
+## Running case: how many relationships sit behind a token?
+
+Imagine a fictional issuer, Harbor Note, holding short-term government bonds and cash and issuing 1,000 tokens to eligible participants. Its initial assumed portfolio value is $100,000, including $20,000 cash. These figures are only teaching assumptions. The token records who holds how many units: **the token, the issuing entity and the bonds are different things**.
+
+Follow the money and the rights separately:
+
+1. **Subscription:** an investor pays the issuer or a designated account under the terms. The recipient, account segregation and receipt of funds require documentary and operational verification.
+2. **Holding:** the issuer creates tokens once the agreed conditions are met, while custody records identify the underlying assets. Whether a holder has a direct interest in the assets or only a claim against the issuer depends on the legal structure.
+3. **Cash flow and exit:** the assets may earn interest; fees, distribution, reinvestment or retained cash depend on the terms. Selling to another investor and requesting redemption from a designated party are different exits.
+
+## The same 100 tokens can carry different rights
+
+- **Arrangement A: an interest in a pool.** Suppose the documents give a holder a proportional economic interest in a pool. Asset ownership, governance, fees and insolvency treatment still require review.
+- **Arrangement B: an issuer claim.** Suppose the documents give a holder a contractual repayment claim against the issuer. Whether assets are segregated or pledged and the holder's insolvency priority must be checked separately.
+
+Identical onchain balances can have different obligors, loss allocation and recovery routes. These are illustrative arrangements, not claims that a structure has the same legal effect everywhere.
+
+**Your decision:** which three kinds of evidence would answer “who owes me what, who owns the assets, and whom can I pursue if the issuer fails?” Start with offering documents, custody and ownership records, and the applicable insolvency arrangements; then check how each party actually performs. A contract address alone cannot answer these questions.
+
+## Experiment: what do onchain numbers tell us?
+
+The numbers below are fictional teaching assumptions. Change the assumed asset value and token supply, and observe the per-token estimate. Could two arrangements with identical numbers have different redemption rights or control over the assets? Those questions require the relevant documents and legal analysis.
+
+<RwaLab />
+
+<Checkpoint
+  id="rwa-rights-structure"
+  question={"What can holding an asset token alone establish?"}
+  options={["The recorded onchain balance; specific legal rights still require checking documents and applicable law", "Direct ownership of the underlying asset in every case", "Guaranteed immediate redemption at face value"]}
+  correctIndex={0}
+  explanation={"A token record and legal rights are different layers; the specific claim and its enforceability depend on the arrangement, documents and applicable law."}
+/>
+
+<SourceList>
+
+- [BIS: The tokenisation continuum](https://www.bis.org/publications/bulletin-72-tokenisation-continuum)
+- [BIS/CPMI: Concepts and implications of tokenisation](https://www.bis.org/publications/tokenisation-context-money-and-other-assets-concepts-and-implications-central-banks)
+
+</SourceList>

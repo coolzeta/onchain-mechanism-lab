@@ -1,6 +1,6 @@
 # 链上机制实验室
 
-面向普通互联网用户的链上机制互动教育网站。当前包含预测市场、AMM、代币发行、治理与金库、撮合引擎、预言机、最小账本、借贷清算、稳定币与 MEV 十个可学习、可操作的机制模块。
+面向普通互联网用户的链上机制互动教育网站。当前包含预测市场、AMM、代币发行、治理与金库、撮合引擎、预言机、最小账本、借贷清算、稳定币、MEV 与 RWA 等十一个可学习、可操作的机制模块。
 
 ```bash
 npm install
@@ -25,7 +25,7 @@ GITHUB_PAGES=true GITHUB_REPOSITORY=coolzeta/onchain-mechanism-lab npm run build
 
 ## 分层
 
-- `src/platform`：站点、内容协议、进度与通用模拟器能力；课程章节共享“误解 → 操作 → 证据”的实验任务卡，十个实验室共享状态快照与实验时间轴，可回退并从任意状态继续分支。首页和进度页还提供可交互的机制依赖地图：每个节点显示证据状态，点击后可沿“它依赖 / 它解锁”继续调查。学习路径页提供本地持久化的起点诊断：先选目标，再用三道边界题把推荐路线解释清楚。
+- `src/platform`：站点、内容协议、进度与通用模拟器能力；课程章节共享“误解 → 操作 → 证据”的实验任务卡，原有十个机制实验室共享状态快照与实验时间轴，可回退并从任意状态继续分支；RWA 实验使用独立假设情景，当前不支持时间轴。首页和进度页还提供可交互的机制依赖地图：每个节点显示证据状态，点击后可沿“它依赖 / 它解锁”继续调查。学习路径页提供本地持久化的起点诊断：先选目标，再用三道边界题把推荐路线解释清楚。
 - `src/modules`：彼此隔离的教学领域模块。
 - `content/<locale>`：与模拟逻辑分离的课程正文。
 
@@ -41,6 +41,7 @@ GITHUB_PAGES=true GITHUB_REPOSITORY=coolzeta/onchain-mechanism-lab npm run build
 - `/zh/learn/oracles`：四章预言机路径，覆盖数据源质量、报告、挑战窗口、经济担保、仲裁与结算交接。
 - `/zh/learn/ledger`：最小账本四章路径，覆盖签名/Nonce、交易池替换、区块重放/状态根和确认数/最终性。
 - `/zh/learn/lending`：四章借贷与清算路径，覆盖抵押品、LTV、健康度、利息、清算、预言机滞后与坏账。
+- `/zh/learn/rwa`：六章 RWA 路径，涵盖法律权利、托管对账、估值转让、赎回、净值和尽调，并可对照假设情景。
 - `/zh/learn/stablecoins`：四章稳定币路径，覆盖锚定、抵押发行、赎回套利、储备风险与挤兑。
 - `/zh/learn/mev`：四章 MEV 与交易排序路径，覆盖交易池、夹子交易、滑点保护、回跑套利、构建者与私有订单流。
 - `/zh/learn/governance`：四章治理与金库路径，覆盖提案状态、投票权快照、委托、法定人数、时间锁、金库执行与紧急取消。
@@ -52,12 +53,13 @@ GITHUB_PAGES=true GITHUB_REPOSITORY=coolzeta/onchain-mechanism-lab npm run build
 - `/zh/journal`：本地研究记录，保存实验状态快照、操作序列、事件轨迹、关键指标和学习者复盘，支持回到实验室、两到三条记录并排对照或导出 JSON。
 - `/zh/modules/*`：尚未开放模块的学习路线预览。
 
-英文内容目前开放预测市场、AMM、撮合引擎、MEV、治理与金库、借贷与清算、稳定币、代币发行、最小账本与预言机十条完整路径：
+英文内容目前开放预测市场、AMM、撮合引擎、MEV、治理与金库、借贷与清算、稳定币、代币发行、最小账本、预言机与 RWA 十一条完整路径：
 
 - `/en/learn/prediction-markets`：问题合同、抵押、订单簿、撮合、隐含概率与预言机结算；互动组件与自由沙盒均支持英文。
 - `/en/learn/amm`：储备曲线、价格冲击、滑点、LP 库存、手续费、套利与无常损失；课程实验与自由沙盒均支持英文。
 - `/en/learn/matching-engine`：价格/时间优先、市价单深度、价差、部分成交、撤改单与自成交保护；课程实验与自由沙盒均支持英文。
 - `/en/learn/lending`：抵押品、LTV、健康度、利息、清算、预言机滞后与坏账；课程实验与自由沙盒均支持英文。
+- `/en/learn/rwa`：RWA rights, custody, valuation, redemption, net asset value, and due diligence with hypothetical scenarios.
 - `/en/learn/stablecoins`：锚定、抵押发行、赎回套利、储备损失与挤兑风险；课程实验与自由沙盒均支持英文。
 - `/en/learn/token-launch`：供应、分配、锁仓、稀释、销毁与多签权限；课程实验与自由沙盒均支持英文。
 - `/en/learn/ledger`：签名/Nonce、交易池替换、区块重放/状态根和确认数/最终性。

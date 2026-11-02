@@ -56,7 +56,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
 
       <section className="atlas page-width" id="curriculum">
         <div className="section-heading">
-          <div><span className="eyebrow">{english ? "COURSES" : "课程目录"}</span><h2>{english ? "Ten courses, each focused on one onchain system." : "十门课程，分别解释一种链上系统。"}</h2></div>
+          <div><span className="eyebrow">{english ? "COURSES" : "课程目录"}</span><h2>{english ? "Courses that explain onchain systems." : "用课程理解不同的链上系统。"}</h2></div>
           <p>{english ? "Each course combines a plain-language explanation with an interactive example. If you are unsure where to begin, use the recommendation above." : "每门课都包括通俗说明、互动示例和理解检查。不确定先学什么，可以使用上面的课程推荐。"}</p>
         </div>
         <div className="category-row">
