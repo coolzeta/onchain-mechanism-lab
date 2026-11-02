@@ -16,6 +16,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
   const { locale } = await params;
   const english = locale === "en";
   const availableModules = modules.filter((module) => isModuleAvailableForLocale(module, locale)).map((module) => getLocalizedModule(module, locale));
+  const catalogModules = [...availableModules].sort((a, b) => Number(b.id === "rwa") - Number(a.id === "rwa"));
   const categoryTitles = english ? { foundations: "Chain foundations", assets: "Asset lifecycle", markets: "Market mechanisms", security: "Truth & risk" } : null;
   return (
     <>
@@ -63,7 +64,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
           {categories.map((category) => <span key={category.id}><b>0{category.index}</b>{categoryTitles?.[category.id as keyof typeof categoryTitles] ?? category.title}</span>)}
         </div>
         <div className="module-grid">
-          {availableModules.map((module) => <ModuleCard key={module.id} module={module} locale={locale} />)}
+          {catalogModules.map((module) => <ModuleCard key={module.id} module={module} locale={locale} />)}
         </div>
       </section>
 

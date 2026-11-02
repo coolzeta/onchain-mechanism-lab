@@ -181,7 +181,7 @@ export function DependencyGraph({ locale }: { locale: string }) {
       <header className="dependency-graph__header">
         <div>
           <span className="eyebrow">{english ? "COURSE MAP" : "课程图谱"}</span>
-          <h2>{english ? "See how ten onchain systems connect" : "先看全貌：十门课程怎样连在一起"}</h2>
+          <h2>{english ? `See how ${graph.nodes.length} onchain systems connect` : `先看全貌：${graph.nodes.length} 门课程怎样连在一起`}</h2>
           <p id="dependency-graph-help">{english ? "Drag a course to rearrange the map. Select it to see prerequisites, related courses, and your learning progress. Arrow keys also move a focused node." : "拖动课程可以调整图谱布局；点选课程后，可以查看建议先学的内容、相关课程和当前进度。聚焦节点后也可以用方向键移动。"}</p>
         </div>
         <div className="dependency-graph__controls">
@@ -227,7 +227,7 @@ export function DependencyGraph({ locale }: { locale: string }) {
               type="button"
             >
               <span className="dependency-graph__node-dot" aria-hidden="true" />
-              <strong>{item.shortTitle}</strong>
+              <strong>{item.id === "rwa" ? "RWA" : item.shortTitle}</strong>
               <small>{knowledge.score}/100 · {label(knowledge.status)}</small>
               <span className="dependency-graph__node-grip" aria-hidden="true">⠿</span>
             </button>
