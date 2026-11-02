@@ -4,7 +4,7 @@ export const rwaManifest: ModuleManifest = {
   id: "rwa",
   categoryId: "assets",
   title: "现实世界资产如何连接到链上",
-  shortTitle: "现实世界资产 · RWA",
+  shortTitle: "RWA · 现实世界资产",
   summary: "追踪代币背后的法律权利、托管、估值和退出边界。",
   description: "通过一个虚构的资产代币化案例，区分链上记录与链下权利，并检查发行、转让、赎回及违约时的关键依赖。",
   status: "available",

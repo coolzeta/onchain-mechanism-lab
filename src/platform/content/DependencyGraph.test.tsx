@@ -27,10 +27,18 @@ describe("DependencyGraph", () => {
     expect(predictionMarket).toHaveStyle({ left: "56%", top: "23%" });
   });
 
+  it("makes the RWA node recognizable and opens its course", () => {
+    render(<DependencyGraph locale="zh" />);
+    const node = screen.getByRole("button", { name: /移动课程节点：RWA/ });
+    expect(node.querySelector("strong")).toHaveTextContent("RWA");
+    fireEvent.click(node);
+    expect(screen.getByRole("link", { name: "查看课程 →" })).toHaveAttribute("href", "/zh/learn/rwa");
+  });
+
   it("shows the selected course relationships and entry point", () => {
     render(<DependencyGraph locale="zh" />);
 
-    expect(screen.getByRole("region", { name: "课程关系图" })).toHaveTextContent("十门课程怎样连在一起");
+    expect(screen.getByRole("region", { name: "课程关系图" })).toHaveTextContent("11 门课程怎样连在一起");
     expect(screen.getByRole("link", { name: "查看课程 →" })).toHaveAttribute("href", "/zh/learn/prediction-markets");
     expect(screen.getByText("订单与撮合")).toBeInTheDocument();
   });

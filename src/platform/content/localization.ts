@@ -6,7 +6,7 @@ type ModuleCopy = Pick<ModuleManifest, "title" | "shortTitle" | "summary" | "des
 const englishCopies: Record<string, ModuleCopy> = {
   rwa: {
     title: "How Real-World Assets Connect to Blockchains",
-    shortTitle: "Real-World Assets · RWA",
+    shortTitle: "RWA · Real-World Assets",
     summary: "Trace the legal rights, custody, valuation and exit boundaries behind a token.",
     description: "Use a hypothetical tokenized asset to distinguish onchain records from offchain rights and investigate issuance, transfer, redemption and default.",
     lessons: {
